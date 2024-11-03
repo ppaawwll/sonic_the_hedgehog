@@ -1,0 +1,14 @@
+<sounds root="sfx/">
+	<sound name="Sonic Jump">
+		<sample weight="1" path="sonicJump.wav"/>
+	</sound>
+	<sound name="Sonic Hit Enemy">
+		<sample weight="1" path="sonicEnemyHit.wav"/>
+	</sound>
+	<sound name="Sonic Hit Boss">
+		<sample weight="1" path="sonicBossHit.wav"/>
+	</sound>
+	<sound name="Sonic Kill">
+		<sample weight="1" path="sonicKill.wav"/>
+	</sound>
+</sounds>

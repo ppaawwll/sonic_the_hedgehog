@@ -1,0 +1,3 @@
+<items gfxroot="gfx/items/" version="1">
+	<active description="ball mode" gfx="collectibles_cowbell.png" maxcharges="0" name="Spinjump" special="true" />
+</items>

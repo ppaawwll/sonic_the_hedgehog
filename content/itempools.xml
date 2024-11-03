@@ -1,0 +1,6 @@
+<ItemPools>
+	<Pool Name="onlyPolaroid">
+		<!--Polaroid Lol-->
+		<Item Id="327" Weight="100" DecreaseBy="0" RemoveOn="0.1"/>
+	</Pool>
+</ItemPools>
