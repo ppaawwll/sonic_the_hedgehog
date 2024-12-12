@@ -127,6 +127,7 @@ local function onPlayerUpdate2(_, player)
 	-- TODO: put this in its own "evaluateSpinjumpSprite()" function
 	if not playerData.SonicBallSprite then
 		playerData.SonicBallSprite = Sprite()
+---@diagnostic disable-next-line: missing-parameter
 		playerData.SonicBallSprite:Load("gfx/characters/sprite_sonic_ball.anm2")
 		if player:GetName() == "Sonic" then
 			playerData.SonicBallSprite:ReplaceSpritesheet(0, "gfx/characters/sonic_spinball_sonic.png")
