@@ -11,4 +11,13 @@
 	<sound name="Sonic Kill">
 		<sample weight="1" path="sonicKill.wav"/>
 	</sound>
+	<sound name="Sonic Spindash Charge">
+		<sample weight="1" path="sonicSpindashCharge.wav"/>
+	</sound>
+	<sound name="Sonic Spindash Launch">
+		<sample weight="1" path="sonicSpindashLaunch.wav"/>
+	</sound>
+	<sound name="Sonic Skid">
+		<sample weight="1" path="sonicSkid.wav"/>
+	</sound>
 </sounds>

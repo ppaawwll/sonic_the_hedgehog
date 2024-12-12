@@ -1,9 +1,7 @@
 <players root="gfx/characters/costumes/" 
-         portraitroot="gfx/ui/boss/" 
-         nameimageroot="gfx/ui/boss/" 
-         bigportraitroot="gfx/ui/stage/">
+         portraitroot="gfx/ui/stage/" 
+         nameimageroot="gfx/ui/boss/">
 	<player name="Sonic" skin="Character_sonic.png" hp="6" canShoot="false"
           nameimage="PlayerName_01_Isaac.png" 
-          portrait="PlayerPortrait_01_Isaac.png" 
-          bigportrait="PlayerPortraitBig_01_Isaac.png" skinColor="2" />
+          portrait="PlayerPortrait_Sonic.png" skinColor="2" />
 </players>
