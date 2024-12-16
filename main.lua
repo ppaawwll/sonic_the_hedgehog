@@ -3,7 +3,8 @@ SonicCharacterMod = RegisterMod("sonic_the_hedgehog", 1)
 require("scripts.lib.jumplib").Init()
 
 costumes = {
-	SONIC_HEAD = Isaac.GetCostumeIdByPath("gfx/characters/costume_sonichead.anm2")
+	SONIC_HEAD = Isaac.GetCostumeIdByPath("gfx/characters/costume_sonichead.anm2"),
+	SONIC_2SPOOKY = Isaac.GetCostumeIdByPath("gfx/characters/sonic_2spooky.anm2")
 }
 
 SonicItems = {
@@ -28,6 +29,10 @@ function SonicCharacterMod:onCache(player, cacheFlag)
 			-- store the uncapped speed
 			playerData.UncappedSpeed = player.MoveSpeed
 		end
+
+		-- if player:HasCollectible(CollectibleType.COLLECTIBLE_2SPOOKY) then
+		-- 	player:AddNullCostume(costumes.SONIC_2SPOOKY)
+		-- end
 		-- if cacheFlag == CacheFlag.CACHE_LUCK then
 			-- player.Luck = player.Luck + Moonwalker.LUCK
 		-- end
@@ -88,7 +93,7 @@ local function onPlayerInit(_, player)
 		-- player:AddCollectible(PawlExperimentItems.COLLECTIBLE_ADRENALINERUSH, 0, false)
 		-- player:AddCollectible(PawlExperimentItems.COLLECTIBLE_TECHCRAFTER, 0, false, 2)	
 		player:SetPocketActiveItem(SonicItems.COLLECTIBLE_SONICJUMP, ActiveSlot.SLOT_POCKET, false)
-		player:AddNullCostume(costumes.SONIC_HEAD)
+		-- player:AddNullCostume(costumes.SONIC_HEAD)
 		-- player:AddNullCostume(costumes.CLEM_DOGHAIR)
 		-- local itemConfig = Isaac.GetItemConfig()
 		-- local itemConfigItem = itemConfig:GetCollectible(CollectibleType.COLLECTIBLE_PHD)
@@ -265,6 +270,7 @@ local function prePlayerRender(_, player, offset)
 	-- if not Game():IsPaused() then
 	local playerData = player:GetData()
 	local jumpData = JumpLib:GetData(player)
+	-- player:GetSprite().Color:SetOffset(-1,0,0)
 		-- if playerData.sonicJumpY ~= nil and playerData.sonicJumpY > 0 or playerData.sonicJumpVelocityY < 0 then
 			-- return false
 		-- end
@@ -280,6 +286,52 @@ local function prePlayerRender(_, player, offset)
 			playerData.SonicBallSprite:RenderLayer(1, Isaac.WorldToScreen(player.Position) - Vector(0,jumpData.Height))
 		end
 		return false
+	end
+
+	if player:GetName() == "Sonic" and player:HasCollectible(CollectibleType.COLLECTIBLE_2SPOOKY) then
+		-- player:AddNullCostume(costumes.SONIC_2SPOOKY)
+		local spookyCostumeVisible = false
+		local alreadySonicSpooky = false
+		for i,c in ipairs(player:GetCostumeSpriteDescs()) do
+			if c:GetItemConfig().ID == 554 or c:GetSprite():GetFilename() == "gfx/characters/costume_sonichead.anm2" or c:GetSprite():GetFilename() == "gfx/characters/sonic_2spooky.anm2" then
+			-- if c:GetItemConfig().ID == 554 then
+
+				-- if c:GetSprite():GetFilename() == "gfx/characters/costume_sonichead.anm2" then
+				-- 	c:GetSprite():Load("gfx/characters/sonic_2spooky.anm2", true)
+				-- end
+				if c:GetItemConfig().ID == 554 then spookyCostumeVisible = true end
+				if c:GetSprite():GetFilename() == "gfx/characters/sonic_2spooky.anm2" then alreadySonicSpooky = true end
+				-- if c:GetSprite():GetFilename() == "gfx/characters/costume_sonichead.anm2" then
+				-- 	c:GetSprite().Color = Color(1,1,1,0)
+				-- end
+				-- c:GetSprite().Color:SetColorize(1,1,1,1)
+				-- c:GetSprite().Color = Color(1,1,1,1)
+			end
+		end
+		if spookyCostumeVisible and not alreadySonicSpooky then
+			player:AddNullCostume(costumes.SONIC_2SPOOKY)
+		elseif not spookyCostumeVisible then
+			player:TryRemoveNullCostume(costumes.SONIC_2SPOOKY)
+		end
+		for i,c in ipairs(player:GetCostumeSpriteDescs()) do
+			if c:GetItemConfig().ID == 554 or c:GetSprite():GetFilename() == "gfx/characters/costume_sonichead.anm2" or c:GetSprite():GetFilename() == "gfx/characters/sonic_2spooky.anm2" then
+
+				-- if c:GetSprite():GetFilename() == "gfx/characters/costume_sonichead.anm2" then
+				-- 	c:GetSprite():Load("gfx/characters/sonic_2spooky.anm2", true)
+				-- end
+				if c:GetSprite():GetFilename() == "gfx/characters/costume_sonichead.anm2" then
+					if spookyCostumeVisible then
+						c:GetSprite().Color:SetTint(1,1,1,0)
+					else
+						c:GetSprite().Color:SetTint(1,1,1,1)
+					end
+				else
+					c:GetSprite().Color:SetOffset(0,0,0)
+				end
+				-- c:GetSprite().Color:SetColorize(1,1,1,1)
+				-- c:GetSprite().Color = Color(1,1,1,1)
+			end
+		end
 	end
 	
 	-- if playerData.sonicJumpY ~= nil and playerData.sonicJumpY <= 1 then
