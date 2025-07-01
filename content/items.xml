@@ -1,3 +1,4 @@
 <items gfxroot="gfx/items/" version="1">
-	<active description="ball mode" gfx="collectibles_spinattack.png" maxcharges="0" name="Spin Attack" special="true" />
+	<active name="Spin Attack" description="ball mode" gfx="collectibles_spinattack.png" maxcharges="0"  special="true" quality="4" />
+	<passive id="1" name="Speed Shoes" description="speed mode" gfx="collectibles_spinattack.png" cache="speed" />
 </items>

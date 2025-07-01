@@ -1,4 +1,5 @@
 <costumes anm2root="gfx/characters/">
 	<costume anm2path="costume_sonichead.anm2" id="1991" type="none" priority="99" />
 	<costume anm2path="sonic_2spooky.anm2" type="none" priority="199" />
+	<costume id="1" anm2path="costume_sonic_shoes.anm2" type="passive" />
 </costumes>

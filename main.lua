@@ -8,13 +8,14 @@ costumes = {
 }
 
 SonicItems = {
-	COLLECTIBLE_SONICJUMP = Isaac.GetItemIdByName("Spin Attack")
+	COLLECTIBLE_SONICJUMP = Isaac.GetItemIdByName("Spin Attack"),
+	COLLECTIBLE_SONICSHOES = Isaac.GetItemIdByName("Speed Shoes")
 }
 
 
 function SonicCharacterMod:onCache(player, cacheFlag)
 	local playerData = player:GetData()
-	if player:GetName() == "Sonic" then -- Especially here!
+	if player:GetName() == "Sonic" or player:HasCollectible(SonicItems.COLLECTIBLE_SONICSHOES) then -- Especially here!
 		-- player.Damage = player.Damage + CartoonCry.DAMAGE
 		-- if cacheFlag == CacheFlag.CACHE_SHOTSPEED then
 			-- player.ShotSpeed = player.ShotSpeed + Moonwalker.SHOTSPEED
@@ -53,7 +54,7 @@ SonicCharacterMod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, SonicCharacterMod.
 
 local function onPlayerUpdate(_, player)
 	local playerData = player:GetData()
-	if player:GetName() == "Sonic" then -- Especially here!
+	if player:GetName() == "Sonic" or player:HasCollectible(SonicItems.COLLECTIBLE_SONICSHOES) then -- Especially here!
 		-- player.Damage = player.Damage + CartoonCry.DAMAGE
 		-- if cacheFlag == CacheFlag.CACHE_SHOTSPEED then
 			-- player.ShotSpeed = player.ShotSpeed + Moonwalker.SHOTSPEED
@@ -83,8 +84,9 @@ local function onPlayerUpdate(_, player)
 	end
 end
 
-local function onRender()	
-
+local function onRender()
+	player = Isaac.GetPlayer()
+	-- player:RenderBody(Isaac.WorldToScreen(player.Position) + Vector(30,0))
 end
 
 local function onPlayerInit(_, player)
@@ -141,20 +143,28 @@ local function onPlayerUpdate2(_, player)
 		-- playerData.SonicBallSprite:Play("Idle", true)
 		print("oenis")
 	end
+	if player:HasCollectible(SonicItems.COLLECTIBLE_SONICJUMP) and not playerData.SonicSpindashChargeSprite then
+		playerData.SonicSpindashChargeSprite = Sprite()
+		playerData.SonicSpindashChargeSprite:Load("gfx/chargebar_sonic.anm2")
+	end
 	local ballDirection = player:GetMovementDirection()
-	if playerData.InSpindash or playerData.CharginsSpindash then
+	if playerData.InSpindash or playerData.ChargingSpindash then
 		ballDirection = playerData.SpindashDirection
 	end
 	if playerData.SonicBallSprite ~= nil then
+
+		local animSuffix = ""
+
+		if playerData.ChargingSpindash then animSuffix = "Spindash" end
 		
 		if ballDirection == playerData.prevMoveDirection then
 		 -- look nothing
 		elseif ballDirection == Direction.LEFT then
-			playerData.SonicBallSprite:Play("Left", true)
+			playerData.SonicBallSprite:Play("Left"..animSuffix, true)
 		elseif ballDirection == Direction.RIGHT then
-			playerData.SonicBallSprite:Play("Right", true)
+			playerData.SonicBallSprite:Play("Right"..animSuffix, true)
 		else
-			playerData.SonicBallSprite:Play("Idle", true)
+			playerData.SonicBallSprite:Play("Idle"..animSuffix, true)
 		end
 		playerData.SonicBallSprite.Scale = player.SpriteScale
 		if playerData.sonicBallUpdate == nil then
@@ -171,6 +181,7 @@ local function onPlayerUpdate2(_, player)
 	end
 	
 	playerData.prevMoveDirection = ballDirection
+	-- player:Render(Vector(30,0))
 	
 	if playerData.alreadyFlying == nil then
 		playerData.alreadyFlying = false
@@ -185,14 +196,16 @@ local function onPlayerUpdate2(_, player)
 				-- player.GridCollisionClass = EntityGridCollisionClass.GRIDCOLL_WALLS
 			-- end
 			player.EntityCollisionClass = EntityCollisionClass.ENTCOLL_ENEMIES
-			-- bigger hitsphere size so its funner to bounce on things
+			-- bigger hitsphere size so its funner to bounce on things (but also only when a little off the ground so you dont have big hitbox syndrome when you land)
 			-- TODO: make this scale with size downs
-			player.Size = 20
+			if jumpData.Height > 10 then
+				player.Size = 20
+			end
 			player:SetShadowSize(0.225)
 			-- player:MultiplyFriction(1.02)
 			-- gets the gridentity currently below the player
 			local gridUnder = Game():GetRoom():GetGridEntityFromPos(player.Position)
-			
+
 			-- if there's something under us and it's poop or tnt and it's not destroyed (less than state 1000 for poop for some reason, <4 for tnt), and we're low enough to bounce on it, do that
 			if gridUnder ~= nil and jumpData.Height < 10 then
 			-- poop
@@ -212,27 +225,46 @@ local function onPlayerUpdate2(_, player)
 			playerData.sonicBriefInvul = playerData.sonicBriefInvul - 1
 		end
 
-		if playerData.CharginsSpindash then
+		-- if not playerData.SpeedFuck then
+		-- 	playerData.SpeedFuck = 1
+		-- else
+		-- 	playerData.SpeedFuck = playerData.SpeedFuck - 1
+		-- 	if playerData.SpeedFuck <= 0 then
+		-- 		if player.Velocity:Length() > 10 	then
+		-- 			player:CreateAfterimage(10,player.Position)
+		-- 		end
+		-- 		playerData.SpeedFuck = 3
+		-- 	end
+		-- end
+
+		-- player:CreateAfterimage(10,player.Position)
+
+		if playerData.ChargingSpindash then
 			local aimingEnough = (math.abs(player:GetAimDirection().X) >= 0.5) or (math.abs(player:GetAimDirection().Y) >= 0.5)
 			-- if player:GetFireDirection() == -1 then
 			if not aimingEnough then
 				playerData.SpindashVector = Isaac.GetAxisAlignedUnitVectorFromDir(playerData.SpindashDirection)
-				playerData.CharginsSpindash = false
+				playerData.ChargingSpindash = false
 				playerData.InSpindash = true
 				player.Velocity = playerData.SpindashVector * Vector(playerData.SpindashSpeed,playerData.SpindashSpeed)
+				playerData.prevMoveDirection = Vector(0,0)
 				SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Launch"), 1)
 				SFXManager():Stop(Isaac.GetSoundIdByName("Sonic Spindash Charge"))
 			elseif player:GetMovementDirection() ~= -1 or playerData.SpindashSpeed < 5 then
 			-- if (player:GetMovementDirection() ~= -1 and player:GetMovementDirection() ~= playerData.SpindashDirection) or playerData.SpindashSpeed < 0.1 then
-				playerData.CharginsSpindash = false
+				playerData.ChargingSpindash = false
 			elseif aimingEnough then
 				playerData.SpindashDirection = player:GetFireDirection()
 				-- Isaac.RenderText(playerData.SpindashSpeed,100,150,1,1,1,1)
+				-- Isaac.RenderText( 
+				-- math.ceil((playerData.SpindashSpeed - 5) * 6.66)
+				-- ,100,150,1,1,1,1)
 				playerData.SpindashSpeed = playerData.SpindashSpeed - 0.1
 			end
 		end
 
 		if playerData.InSpindash then
+			-- playerData.ChargingSpindash = false
 			-- player:MultiplyFriction(1.11)
 			-- player:MultiplyFriction(1.1)
 			-- player:MultiplyFriction(1.05)
@@ -242,7 +274,8 @@ local function onPlayerUpdate2(_, player)
 				-- player.Velocity = player.Velocity + playerData.SpindashVector * Vector(20 - player.Velocity:Length(),20 - player.Velocity:Length())
 				player.Velocity = player.Velocity + playerData.SpindashVector
 			end
-			playerData.SpindashSpeed = playerData.SpindashSpeed - 0.11
+			-- playerData.SpindashSpeed = playerData.SpindashSpeed - 0.11
+			playerData.SpindashSpeed = playerData.SpindashSpeed - (40 / player.TearRange)
 			-- player.Velocity = player:GetMovementInput() * Vector(10,10)
 			-- if player:GetMovementDirection() ~= -1 and player:GetMovementDirection() ~= playerData.SpindashDirection then
 			if player:GetMovementDirection() ~= -1 or playerData.SpindashSpeed < 5 then
@@ -276,17 +309,31 @@ local function prePlayerRender(_, player, offset)
 		-- end
 	-- end
 	
+	-- player:Render(Vector(30,0))
+	-- player:GetSprite():Render(Isaac.WorldToScreen(player.Position) + Vector(0,5))
+	-- player:GetSprite():RenderLayer(1,Isaac.WorldToScreen(player.Position) + Vector(30,0))
+	-- print(player:GetSprite():GetLayerCount())
+
 	-- if playerData.sonicJumpY ~= nil and playerData.sonicJumpY > 1 then
 	-- TODO: make the ball sprite's tint match the base sprite's tint
-	if (jumpData.Jumping and jumpData.Tags["SonicCharacterMod_SpinJump"]) or (playerData.InSpindash or playerData.CharginsSpindash) then
+	if (jumpData.Jumping and jumpData.Tags["SonicCharacterMod_SpinJump"]) or (playerData.InSpindash or playerData.ChargingSpindash) then
 		-- playerData.SonicBallSprite:RenderLayer(0, Isaac.WorldToScreen(player.Position) - Vector(0,playerData.sonicJumpY))
 		playerData.SonicBallSprite:RenderLayer(0, Isaac.WorldToScreen(player.Position) - Vector(0,jumpData.Height))
+		-- spindash chargebar
+		if playerData.ChargingSpindash and playerData.SonicSpindashChargeSprite and Options.ChargeBars then
+			playerData.SonicSpindashChargeSprite:SetFrame("Charging",
+			-- range of 0-15 to pecentage
+			math.ceil((playerData.SpindashSpeed - 5) * 6.66) + 1)
+			playerData.SonicSpindashChargeSprite:Render(Isaac.WorldToScreen(player.Position) + Vector(17,-33))
+		end
 		if player:GetName() == "Sonic" then
 			-- playerData.SonicBallSprite:RenderLayer(1, Isaac.WorldToScreen(player.Position) - Vector(0,playerData.sonicJumpY))
 			playerData.SonicBallSprite:RenderLayer(1, Isaac.WorldToScreen(player.Position) - Vector(0,jumpData.Height))
 		end
 		return false
 	end
+
+
 
 	if player:GetName() == "Sonic" and player:HasCollectible(CollectibleType.COLLECTIBLE_2SPOOKY) then
 		-- player:AddNullCostume(costumes.SONIC_2SPOOKY)
@@ -364,6 +411,11 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 	-- .. " " .. tostring(
 	-- math.abs(player:GetAimDirection().Y) >= 0.5
 	-- ))
+
+	local spinIncrease = ( 1.2	 + ( 10 / (player.MaxFireDelay) ))
+	-- local spinIncrease = 30 / (player.MaxFireDelay + 4)
+	local maxSpindashSpeed = 20
+
 	if not aimingEnough then
 		playerData.InSpindash = false
 		playerData.alreadyFlying = player:IsFlying()
@@ -371,17 +423,20 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 		SFXManager():Play(Isaac.GetSoundIdByName("Sonic Jump"), 1)
 		local config = getGlobalSonicJumpConfig()
 		JumpLib:Jump(player,config)
-	elseif playerData.CharginsSpindash then
-		local maxSpindashSpeed = 20
-		playerData.SpindashSpeed = playerData.SpindashSpeed + 2
+	elseif playerData.ChargingSpindash then
+		-- playerData.SpindashSpeed = playerData.SpindashSpeed + 2
+		playerData.SpindashSpeed = playerData.SpindashSpeed + spinIncrease
+		print(spinIncrease)
+		-- print(player.MaxFireDelay)
 		if playerData.SpindashSpeed > maxSpindashSpeed then playerData.SpindashSpeed = maxSpindashSpeed end
 		SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Charge"), 1, 0, false, 1 + ((playerData.SpindashSpeed - 10) / 20))
 	elseif player:GetMovementDirection() == -1 and not playerData.InSpindash then
-		playerData.CharginsSpindash = true
+		playerData.ChargingSpindash = true
 		playerData.SpindashDirection = player:GetFireDirection()
 		playerData.SpindashVector = Isaac.GetAxisAlignedUnitVectorFromDir(playerData.SpindashDirection)
-		playerData.SpindashSpeed = 10
-		SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Charge"), 1, 0, false, 1)
+		playerData.SpindashSpeed = math.min(8 + spinIncrease, maxSpindashSpeed)
+		-- SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Charge"), 1, 0, false, 1)
+		SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Charge"), 1, 0, false, 1 + ((playerData.SpindashSpeed - 10) / 20))
 		-- playerData.SpindashSoundTimer = 9
 		-- -- playerData.SpindashSpeed = 10
 		-- player.Velocity = playerData.SpindashVector * Vector(playerData.SpindashSpeed,playerData.SpindashSpeed)
@@ -451,7 +506,14 @@ end
 
 local function onPlayerTakeDmg(_, player, amount, flags, source, countdown)
 	local playerData = player:GetData()
+	local jumpData = JumpLib:GetData(player)
 	if playerData.sonicBriefInvul ~= nil and playerData.sonicBriefInvul > 0 then
+		return false
+	end
+	-- can jump over red poop
+	-- TODO: make you consistently take damage when landing on red poop or make you not take damage when you land right next to a red poop
+	-- if (flags & DamageFlag.DAMAGE_POOP == DamageFlag.DAMAGE_POOP) and jumpData.Height >= 10 then
+	if (flags & DamageFlag.DAMAGE_POOP == DamageFlag.DAMAGE_POOP) and jumpData.Jumping then
 		return false
 	end
 end
