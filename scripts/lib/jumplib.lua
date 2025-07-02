@@ -1,6 +1,6 @@
 --[[
     Jump Library by Kerkel
-    Version 1.3
+    Version 1.3.6
     Direct issues and requests to the dedicated resources post in https://discord.gg/modding-of-isaac-962027940131008653
     GitHub repository: https://github.com/drpandacat/JumpLib/
     GitBook documentation: https://kerkeland.gitbook.io/jumplib
@@ -54,11 +54,12 @@
 ---@field GridCollToSet GridCollisionClass
 ---@field EntCollToSet EntityCollisionClass
 ---@field Familiar Entity
+---@field JumpPos Vector
 
 local LOCAL_JUMPLIB = {}
 
 function LOCAL_JUMPLIB.Init()
-    local LOCAL_VERSION = 10
+    local LOCAL_VERSION = 17
 
     if JumpLib then
         if JumpLib.Version > LOCAL_VERSION then
@@ -86,29 +87,6 @@ function LOCAL_JUMPLIB.Init()
     ---* player = `PlayerType`
     ---* weapon = `WeaponType` (REPENTOGON-only)
     JumpLib.Callbacks = {
-        ---Called before a player jumps
-        ---
-        ---Parameters:
-        ---* player - `EntityPlayer`
-        ---* config - `PassedJumpConfig`
-        ---
-        ---Returns:
-        ---* Return `true` to cancel jump
-        ---* Return `JumpConfig` object to override config
-        PRE_PLAYER_JUMP = "JUMPLIB_PRE_PLAYER_JUMP",
-        ---Called after a player jumps
-        ---
-        ---Parameters:
-        ---* player - `EntityPlayer`
-        ---* config - `PassedJumpConfig`
-        POST_PLAYER_JUMP = "JUMPLIB_POST_PLAYER_JUMP",
-        ---Called after a player lands
-        ---
-        ---Parameters:
-        ---* player - `EntityPlayer`
-        ---* data - `JumpData`
-        ---* pitfall - `boolean`
-        PLAYER_LAND = "JUMPLIB_PLAYER_LAND",
         ---Called before an entity jumps
         ---
         ---Parameters:
@@ -160,23 +138,6 @@ function LOCAL_JUMPLIB.Init()
         ---* player - `EntityPlayer`
         ---* data - `JumpData`
         PITFALL_EXIT = "JUMPLIB_PITFALL_EXIT",
-        ---Called before setting a player's fallspeed
-        ---
-        ---Parameters:
-        ---* player - `EntityPlayer`
-        ---* speed - `number`
-        ---* data - `JumpData`
-        ---Returns:
-        ---* Return `true` to cancel
-        ---* Return `number` to multiply provided speed by
-        PRE_PLAYER_SET_FALLSPEED = "JUMPLIB_PRE_PLAYER_SET_FALLSPEED",
-        ---Called after setting a player's fallspeed
-        ---
-        ---Parameters:
-        ---* player - `EntityPlayer`
-        ---* speed - `number`
-        ---* data - `JumpData`
-        POST_PLAYER_SET_FALLSPEED = "JUMPLIB_POST_PLAYER_SET_FALLSPEED",
         ---Called before setting an entity's fallspeed
         ---
         ---Parameters:
@@ -194,22 +155,6 @@ function LOCAL_JUMPLIB.Init()
         ---* speed - `number`
         ---* data - `JumpData`
         POST_ENTITY_SET_FALLSPEED = "JUMPLIB_POST_ENTITY_SET_FALLSPEED",
-        ---@deprecated
-        GET_LASER_CAN_FOLLOW_ENTITY = "JUMPLIB_GET_LASER_CAN_FOLLOW_ENTITY",
-        ---@deprecated
-        GET_LASER_CAN_FOLLOW_PLAYER = "JUMPLIB_GET_LASER_CAN_FOLLOW_PLAYER",
-        ---Runs 30 times per second for every player in the air
-        ---
-        ---Parameters:
-        ---* player - `EntityPlayer`
-        ---* data - `JumpData`
-        PLAYER_UPDATE_30 = "JUMPLIB_PLAYER_UPDATE_30",
-        ---Runs 60 times per second for every player in the air
-        ---
-        ---Parameters:
-        ---* player - `EntityPlayer`
-        ---* data - `JumpData`
-        PLAYER_UPDATE_60 = "JUMPLIB_PLAYER_UPDATE_60",
         ---Runs 30 times per second for every entity in the air
         ---
         ---Parameters:
@@ -231,15 +176,26 @@ function LOCAL_JUMPLIB.Init()
         ---Returns:
         ---* Return `true` to cancel the update
         PRE_ENTITY_UPDATE = "JUMPLIB_PRE_ENTITY_UPDATE",
-        ---Runs 60 times per second for every player in the air, before `PLAYER_UPDATE_60`
-        ---
-        ---Parameters:
-        ---* players - `EntityPlayer`
-        ---* data - `JumpData`
-        ---
-        ---Returns:
-        ---* Return `true` to cancel the update
+        ---@deprecated
+        PRE_PLAYER_JUMP = "JUMPLIB_PRE_PLAYER_JUMP",
+        ---@deprecated
+        POST_PLAYER_JUMP = "JUMPLIB_POST_PLAYER_JUMP",
+        ---@deprecated
+        PLAYER_LAND = "JUMPLIB_PLAYER_LAND",
+        ---@deprecated
+        PRE_PLAYER_SET_FALLSPEED = "JUMPLIB_PRE_PLAYER_SET_FALLSPEED",
+        ---@deprecated
+        POST_PLAYER_SET_FALLSPEED = "JUMPLIB_POST_PLAYER_SET_FALLSPEED",
+        ---@deprecated
         PRE_PLAYER_UPDATE = "JUMPLIB_PRE_PLAYER_UPDATE",
+        ---@deprecated
+        GET_LASER_CAN_FOLLOW_ENTITY = "JUMPLIB_GET_LASER_CAN_FOLLOW_ENTITY",
+        ---@deprecated
+        GET_LASER_CAN_FOLLOW_PLAYER = "JUMPLIB_GET_LASER_CAN_FOLLOW_PLAYER",
+        ---@deprecated
+        PLAYER_UPDATE_30 = "JUMPLIB_PLAYER_UPDATE_30",
+        ---@deprecated
+        PLAYER_UPDATE_60 = "JUMPLIB_PLAYER_UPDATE_60",
     }
 
     JumpLib.Flags = {
@@ -272,21 +228,27 @@ function LOCAL_JUMPLIB.Init()
         ---Tear-copying familiars will follow the player while jumping
         FAMILIAR_FOLLOW_TEARCOPYING = 1 << 12,
         ---Lasers will not use default jumping behaviors
-        LASER_FOLLOW_CUSTOM = 1 << 13,
+        LASER_FOLLOW_CUSTOM = 1 << 14,
         ---Bombs drop as if you were not jumping
-        DISABLE_COOL_BOMBS = 1 << 14,
+        DISABLE_COOL_BOMBS = 1 << 15,
         ---Bombs are unable to be dropped
-        DISABLE_BOMB_INPUT = 1 << 15,
+        DISABLE_BOMB_INPUT = 1 << 16,
         ---Player is unable to shoot
-        DISABLE_SHOOTING_INPUT = 1 << 16,
+        DISABLE_SHOOTING_INPUT = 1 << 17,
         ---Disables tears and projectiles being spawned at spawner height
-        DISABLE_TEARHEIGHT = 1 << 17,
+        DISABLE_TEARHEIGHT = 1 << 18,
         ---Entity will not collide with walls
-        GRIDCOLL_NO_WALLS = 1 << 18,
+        GRIDCOLL_NO_WALLS = 1 << 19,
         ---Damage is not prevented while in the air
-        DAMAGE_CUSTOM = 1 << 19,
+        DAMAGE_CUSTOM = 1 << 20,
         ---Following familiars will follow the player while jumping
-        FAMILIAR_FOLLOW_FOLLOWERS = 1 << 20,
+        FAMILIAR_FOLLOW_FOLLOWERS = 1 << 21,
+        ---Player is unable to move
+        DISABLE_MOVING_INPUT = 1 << 22,
+        ---Player can't use consumables
+        DISABLE_PILL_CARD_INPUT = 1 << 23,
+        ---Player can't use active item
+        DISABLE_ACTIVE_ITEM_INPUT = 1 << 24,
 
         ---Use `FAMILIAR_FOLLOW_ORBITALS`
         ---@deprecated
@@ -343,6 +305,24 @@ function LOCAL_JUMPLIB.Init()
             ModCallbacks.MC_PRE_NPC_RENDER,
             ModCallbacks.MC_PRE_EFFECT_RENDER,
         },
+        PLAYER_TO_ENTITY_CALLBACK = {
+            ---@diagnostic disable-next-line: deprecated
+            [JumpLib.Callbacks.PLAYER_LAND] = JumpLib.Callbacks.ENTITY_LAND,
+            ---@diagnostic disable-next-line: deprecated
+            [JumpLib.Callbacks.PLAYER_UPDATE_30] = JumpLib.Callbacks.ENTITY_UPDATE_30,
+            ---@diagnostic disable-next-line: deprecated
+            [JumpLib.Callbacks.PLAYER_UPDATE_60] = JumpLib.Callbacks.ENTITY_UPDATE_60,
+            ---@diagnostic disable-next-line: deprecated
+            [JumpLib.Callbacks.PRE_PLAYER_JUMP] = JumpLib.Callbacks.PRE_ENTITY_JUMP,
+            ---@diagnostic disable-next-line: deprecated
+            [JumpLib.Callbacks.PRE_PLAYER_UPDATE] = JumpLib.Callbacks.PRE_ENTITY_UPDATE,
+            ---@diagnostic disable-next-line: deprecated
+            [JumpLib.Callbacks.PRE_PLAYER_SET_FALLSPEED] = JumpLib.Callbacks.PRE_ENTITY_SET_FALLSPEED,
+            ---@diagnostic disable-next-line: deprecated
+            [JumpLib.Callbacks.POST_PLAYER_JUMP] = JumpLib.Callbacks.POST_ENTITY_JUMP,
+            ---@diagnostic disable-next-line: deprecated
+            [JumpLib.Callbacks.POST_PLAYER_SET_FALLSPEED] = JumpLib.Callbacks.POST_ENTITY_SET_FALLSPEED,
+        },
         TEAR_COPYING_FAMILIARS = {
             [FamiliarVariant.INCUBUS] = true,
             [FamiliarVariant.TWISTED_BABY] = true,
@@ -362,6 +342,12 @@ function LOCAL_JUMPLIB.Init()
             [ButtonAction.ACTION_SHOOTUP] = true,
             [ButtonAction.ACTION_SHOOTDOWN] = true,
         },
+        MOVE_ACTIONS = {
+            [ButtonAction.ACTION_LEFT] = true,
+            [ButtonAction.ACTION_RIGHT] = true,
+            [ButtonAction.ACTION_UP] = true,
+            [ButtonAction.ACTION_DOWN] = true,
+        },
         SchedulerEntries = {},
         Vector = {
             Zero = Vector(0, 0),
@@ -377,6 +363,11 @@ function LOCAL_JUMPLIB.Init()
         GRID_PLAYER_SEARCH_RADIUS = 50,
         ---Non-REPENTOGON
         PLAYER_POSITION_OFFSET_MULT = 1.5,
+        WATCHSTATE_TO_TIMESCALE = {
+            [0] = 1,
+            [1] = 0.8,
+            [2] = 1.43
+        }
     }
 
     ---@param callback ModCallbacks | JumpCallback
@@ -622,13 +613,7 @@ function LOCAL_JUMPLIB.Init()
             passedConfig = config
         end
 
-        local returns = JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_ENTITY_JUMP, entity, passedConfig)
-
-        if player then
-            for _, v in ipairs(JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_PLAYER_JUMP, player, config)) do
-                table.insert(returns, v)
-            end
-        end
+        local returns = JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_ENTITY_JUMP, player or entity, passedConfig)
 
         if not force and (config.Flags & JumpLib.Flags.IGNORE_CONFIG_OVERRIDE == 0) then
             for _, v in ipairs(returns) do
@@ -643,6 +628,7 @@ function LOCAL_JUMPLIB.Init()
 
         if not data.Jumping then
             table.insert(JumpLib.Internal.ActiveEntities, entity)
+            data.JumpPos = entity.Position
         end
 
         data.Flags = config.Flags
@@ -691,11 +677,9 @@ function LOCAL_JUMPLIB.Init()
             end
         end
 
-        JumpLib:RunCallbackWithParam(JumpLib.Callbacks.POST_ENTITY_JUMP, entity, config)
+        JumpLib:RunCallbackWithParam(JumpLib.Callbacks.POST_ENTITY_JUMP, player or entity, config)
 
         if player then
-            JumpLib:RunCallbackWithParam(JumpLib.Callbacks.POST_PLAYER_JUMP, player, config)
-
             local orbitals = data.Flags & JumpLib.Flags.FAMILIAR_FOLLOW_ORBITALS ~= 0
             local followers = data.Flags & JumpLib.Flags.FAMILIAR_FOLLOW_FOLLOWERS ~= 0
             local tearcopying = data.Flags & JumpLib.Flags.FAMILIAR_FOLLOW_TEARCOPYING ~= 0
@@ -788,27 +772,10 @@ function LOCAL_JUMPLIB.Init()
         JumpLib.Internal:ScheduleFunction(function ()
             player:AnimatePitfallOut()
 
-            local room = game:GetRoom()
-            local closestPos
-
-            for i = DoorSlot.LEFT0, DoorSlot.DOWN1 do
-                local door = room:GetDoor(i)
-
-                if door then
-                    local pos = door.Position
-
-                    if not closestPos or player.Position:Distance(pos) < player.Position:Distance(closestPos) then
-                        closestPos = pos
-                    end
-                end
-            end
-
-            closestPos = closestPos or room:FindFreePickupSpawnPosition(player.Position, 40)
-
             player:AddCacheFlags(CacheFlag.CACHE_SIZE)
             player:EvaluateItems()
 
-            data.PitPos = room:GetClampedPosition(closestPos, 20)
+            data.PitPos = data.JumpPos or game:GetRoom():FindFreePickupSpawnPosition(player.Position, 40, true, true)
         end, JumpLib.Constants.PITFRAME_DAMAGE, true)
 
         JumpLib.Internal:ScheduleFunction(function ()
@@ -895,15 +862,7 @@ function LOCAL_JUMPLIB.Init()
         local player = entity:ToPlayer()
 
         if data.Flags & JumpLib.Flags.IGNORE_FALLSPEED_MODIFIERS == 0 then
-            local returns = {}
-
-            if player then
-                returns = JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_PLAYER_SET_FALLSPEED, player, speed, JumpLib:GetData(player))
-            end
-
-            for _, v in ipairs(JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_ENTITY_SET_FALLSPEED, entity, speed, JumpLib:GetData(entity))) do
-                table.insert(returns, v)
-            end
+            local returns = JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_ENTITY_SET_FALLSPEED, player or entity, speed, JumpLib:GetData(entity))
 
             for _, v in ipairs(returns) do
                 if type(v) == "number" then
@@ -916,11 +875,7 @@ function LOCAL_JUMPLIB.Init()
 
         JumpLib.Internal:GetData(entity).Fallspeed = speed
 
-        if player then
-            JumpLib:RunCallbackWithParam(JumpLib.Callbacks.POST_PLAYER_SET_FALLSPEED, player, speed, JumpLib:GetData(player))
-        end
-
-        JumpLib:RunCallbackWithParam(JumpLib.Callbacks.POST_ENTITY_SET_FALLSPEED, entity, speed, JumpLib:GetData(entity))
+        JumpLib:RunCallbackWithParam(JumpLib.Callbacks.POST_ENTITY_SET_FALLSPEED, player or entity, speed, JumpLib:GetData(entity))
 
         return true
     end
@@ -981,32 +936,22 @@ function LOCAL_JUMPLIB.Init()
         entityData.UpdateFrame = (entityData.UpdateFrame or 1) + 1
 
         if entityData.Jumping then
-            for _, v in ipairs(JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_ENTITY_UPDATE, entity, jumpData)) do
+            for _, v in ipairs(JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_ENTITY_UPDATE, player or entity, jumpData)) do
                 if v == true then
                     return
                 end
             end
 
-            if player then
-                for _, v in ipairs(JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PRE_PLAYER_UPDATE, player, jumpData)) do
-                    if v == true then
-                        return
-                    end
-                end
+            if entityData.UpdateFrame % 2 == 0 and entityData.Jumping then
+                JumpLib:RunCallbackWithParam(JumpLib.Callbacks.ENTITY_UPDATE_30, player or entity, jumpData)
             end
 
-            if entityData.UpdateFrame % 2 == 0 then
-                JumpLib:RunCallbackWithParam(JumpLib.Callbacks.ENTITY_UPDATE_30, entity, jumpData)
+            local timescale = JumpLib.Internal.WATCHSTATE_TO_TIMESCALE[game:GetRoom():GetBrokenWatchState() or 0]
 
-                if player and entityData.Jumping then
-                    JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PLAYER_UPDATE_30, player, jumpData)
-                end
-            end
-
-            entityData.Fallspeed = entityData.Fallspeed + JumpLib.Constants.FALLSPEED_INCR * entityData.StaticJumpSpeed
+            entityData.Fallspeed = entityData.Fallspeed + (JumpLib.Constants.FALLSPEED_INCR * entityData.StaticJumpSpeed) * timescale
 
             entityData.Height = math.max(0,
-                entityData.Height + entityData.StaticHeightIncrease - entityData.Fallspeed * entityData.StaticJumpSpeed
+                entityData.Height + (entityData.StaticHeightIncrease - entityData.Fallspeed * entityData.StaticJumpSpeed) * timescale
             )
 
             if not REPENTOGON and not player then
@@ -1014,11 +959,7 @@ function LOCAL_JUMPLIB.Init()
             end
 
             JumpLib.Internal:UpdateCollision(entity)
-            JumpLib:RunCallbackWithParam(JumpLib.Callbacks.ENTITY_UPDATE_60, entity, jumpData)
-
-            if player then
-                JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PLAYER_UPDATE_60, player, jumpData)
-            end
+            JumpLib:RunCallbackWithParam(JumpLib.Callbacks.ENTITY_UPDATE_60, player or entity, jumpData)
 
             if entityData.Height == 0 then
                 entityData.PrevTags = entityData.Tags
@@ -1092,11 +1033,7 @@ function LOCAL_JUMPLIB.Init()
                     end
                 end
 
-                JumpLib:RunCallbackWithParam(JumpLib.Callbacks.ENTITY_LAND, entity, jumpData, fell)
-
-                if player then
-                    JumpLib:RunCallbackWithParam(JumpLib.Callbacks.PLAYER_LAND, player, jumpData, fell)
-                end
+                JumpLib:RunCallbackWithParam(JumpLib.Callbacks.ENTITY_LAND, player or entity, jumpData, fell)
 
                 entityData.PrevTags = nil
             end
@@ -1121,10 +1058,17 @@ function LOCAL_JUMPLIB.Init()
         player.GridCollisionClass = EntityGridCollisionClass.GRIDCOLL_NONE
         player.EntityCollisionClass = EntityCollisionClass.ENTCOLL_NONE
 
-        player.Velocity = (data.PitPos - player.Position) * 0.1
+        player.Velocity = (data.PitPos - player.Position):Resized(player.Position:Distance(data.PitPos) * 0.2)
 
         if player:GetSprite():IsFinished("FallIn") then
             player.SpriteScale = JumpLib.Internal.Vector.Zero
+        end
+    end)
+
+    AddCallback(ModCallbacks.MC_POST_NEW_ROOM, function ()
+        for i = 0, game:GetNumPlayers() - 1 do
+            local player = Isaac.GetPlayer(i)
+            JumpLib.Internal:GetData(player).JumpPos = player.Position
         end
     end)
 
@@ -1138,18 +1082,22 @@ function LOCAL_JUMPLIB.Init()
     end
 
     ---@param laser EntityLaser
-    ---@diagnostic disable-next-line: undefined-field
-    AddCallback(REPENTOGON and ModCallbacks.MC_PRE_LASER_UPDATE or ModCallbacks.MC_POST_LASER_UPDATE, function (_, laser)
+    AddCallback(ModCallbacks.MC_POST_LASER_RENDER, function (_, laser)
         if laser.Variant == LaserVariant.TRACTOR_BEAM then return end
 
-        local entity = laser.SpawnerEntity or laser.Parent
+        local entity = laser.Parent
+
+        if not entity then return end
+
+        if game:GetRoom():GetRenderMode() == RenderMode.RENDER_WATER_REFLECT then return end
+
         local entityData = entity and JumpLib.Internal:GetData(entity)
 
         if entityData and entityData.Jumping then
             if JumpLib:GetData(entity).Flags & JumpLib.Flags.LASER_FOLLOW_CUSTOM == 0 then
                 local laserData = JumpLib.Internal:GetData(laser)
 
-                if not (laser.DisableFollowParent or (laser:IsCircleLaser())) or not laserData.SetInitialLaserHeight then
+                if not (laser.DisableFollowParent or laser:IsCircleLaser()) or not laserData.SetInitialLaserHeight then
                     local config = entityData.Config
 
                     config.Speed = 0
@@ -1165,6 +1113,7 @@ function LOCAL_JUMPLIB.Init()
 
                     laserData.SetInitialLaserHeight = true
                 end
+
                 laser.PositionOffset = JumpLib:GetOffset(laser)
             end
         end
@@ -1187,7 +1136,8 @@ function LOCAL_JUMPLIB.Init()
 
     ---@param bomb EntityBomb
     AddCallback(ModCallbacks.MC_POST_BOMB_INIT, function (_, bomb)
-        if bomb.SpawnerType ~= EntityType.ENTITY_PLAYER then return end
+        if not (bomb.SpawnerEntity and bomb.SpawnerEntity.Type == EntityType.ENTITY_PLAYER) then return end
+        if bomb.Position:Distance(bomb.SpawnerEntity.Position) > 1 then return end
         local data = JumpLib:GetData(bomb.SpawnerEntity) if not data.Jumping or data.Flags & JumpLib.Flags.DISABLE_COOL_BOMBS ~= 0 then return end
 
         JumpLib:SetHeight(bomb, data.Height, {
@@ -1240,6 +1190,7 @@ function LOCAL_JUMPLIB.Init()
     ---@param tear EntityTear | EntityProjectile
     local function TearUpdate(_, tear)
         if tear.FrameCount ~= 0 then return end
+        if tear.Type == EntityType.ENTITY_TEAR and tear:HasTearFlags(TearFlags.TEAR_CHAIN) then return end
 
         local spawner = tear.SpawnerEntity or tear.Parent if not spawner then return end
         local familiar = JumpLib.Internal:GetData(tear).Familiar
@@ -1259,18 +1210,17 @@ function LOCAL_JUMPLIB.Init()
     ---@param hook InputHook
     ---@param action ButtonAction
     AddCallback(ModCallbacks.MC_INPUT_ACTION, function (_, entity, hook, action)
-        local player = entity and entity:ToPlayer() if not player then return end
-        local data = JumpLib:GetData(player) if not data.Jumping then return end
+        if not entity then return end
 
-        if data.Flags & JumpLib.Flags.DISABLE_BOMB_INPUT ~= 0 then
-            if action == ButtonAction.ACTION_BOMB then
-                return JumpLib.Internal.HOOK_TO_CANCEL[hook]
-            end
-        elseif data.Flags & JumpLib.Flags.DISABLE_SHOOTING_INPUT ~= 0 then
-            if JumpLib.Internal.SHOOT_ACTIONS[action] then
-                return JumpLib.Internal.HOOK_TO_CANCEL[hook]
-            end
-        end
+        local data = JumpLib:GetData(entity) if not data.Jumping then return end
+
+        if (JumpLib.Internal.MOVE_ACTIONS[action] and data.Flags & JumpLib.Flags.DISABLE_MOVING_INPUT ~= 0)
+        or (JumpLib.Internal.SHOOT_ACTIONS[action] and data.Flags & JumpLib.Flags.DISABLE_SHOOTING_INPUT ~= 0)
+        or (action == ButtonAction.ACTION_BOMB and data.Flags & JumpLib.Flags.DISABLE_BOMB_INPUT ~= 0)
+        or (action == ButtonAction.ACTION_PILLCARD and data.Flags & JumpLib.Flags.DISABLE_PILL_CARD_INPUT ~= 0)
+        or (action == ButtonAction.ACTION_ITEM and data.Flags & JumpLib.Flags.DISABLE_ACTIVE_ITEM_INPUT ~= 0) then
+            return JumpLib.Internal.HOOK_TO_CANCEL[hook]
+        end     
     end)
 
     ---@param entity Entity
@@ -1308,7 +1258,27 @@ function LOCAL_JUMPLIB.Init()
         }) do
             AddCallback(v, GridCollision)
         end
+
+        ---@param effect EntityEffect
+        AddCallback(ModCallbacks.MC_PRE_EFFECT_RENDER, function (_, effect)
+            if not effect.Parent then return end
+            return JumpLib:GetOffset(effect.Parent)
+        end, 201)
     end
+
+    AddCallback(ModCallbacks.MC_POST_GAME_STARTED, function ()
+        for playerCallback, entityCallback in pairs(JumpLib.Internal.PLAYER_TO_ENTITY_CALLBACK) do
+            for _, callbackEntry in pairs(Isaac.GetCallbacks(playerCallback)) do
+                -- print("Patching callback " .. playerCallback .. " to " .. entityCallback .. " from mod " .. callbackEntry.Mod.Name .. "!")
+                local param = callbackEntry.Param
+                param = param or {}
+                ---@diagnostic disable-next-line: inject-field
+                param.type = EntityType.ENTITY_PLAYER
+                callbackEntry.Mod:RemoveCallback(playerCallback, callbackEntry.Function)
+                callbackEntry.Mod:AddCallback(entityCallback, callbackEntry.Function, param)
+            end
+        end
+    end)
 
     for _, v in ipairs(JumpLib.Internal.CallbackEntries) do
         if v.Priority then

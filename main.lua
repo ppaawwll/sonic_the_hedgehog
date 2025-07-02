@@ -112,7 +112,7 @@ local function getGlobalSonicJumpConfig()
 		Height = 10.2,
 		Speed = 1.25,
 		Tags = "SonicCharacterMod_SpinJump",
-		Flags = JumpLib.Flags.DAMAGE_CUSTOM
+		Flags = JumpLib.Flags.DAMAGE_CUSTOM + JumpLib.Flags.NO_HURT_PITFALL
 	}
 end
 
@@ -454,7 +454,7 @@ local function onNPCCollision(_, npc, collider, low)
 	local playerData = collider:GetData()
 	local jumpData = JumpLib:GetData(collider)
 
-	if ((jumpData.Height < npc.Size * 2.5 or (jumpData.Height < npc.Size * 3 and playerData.UncappedSpeed > 2.2)) and (jumpData.Jumping and jumpData.Tags["SonicCharacterMod_SpinJump"])) then
+	if ((jumpData.Height < npc.Size * 3 or (jumpData.Height < npc.Size * 4 and playerData.UncappedSpeed > 2.2)) and (jumpData.Jumping and jumpData.Tags["SonicCharacterMod_SpinJump"])) then
 		-- take damage with a multiplier based on the player's velocity
 		-- npc:TakeDamage(collider:ToPlayer().Damage * (2 + collider.Velocity:Length() / 8),0,EntityRef(collider),10)
 		print(npc.HitPoints)
