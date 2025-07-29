@@ -2,9 +2,11 @@
 <metadata>
     <name>Sonic the Hedgehog (development branch)</name>
     <directory>sonic_the_hedgehog</directory>
-    <id>0</id>
-    <description></description>
-    <version>0.1</version>
+    <id>3514802524</id>
+    <description>the page for the work-in-progress character mod of sonic the hedgehog. please give constructive feedback on stuff that needs fixing or tweaking
+
+also thanks to Beetalia for help with spriting/co-spriting</description>
+    <version>0.5</version>
     <visibility>Private</visibility>
     <tag id="Lua"/>
     <tag id="Active Items"/>
