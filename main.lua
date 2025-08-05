@@ -377,6 +377,7 @@ local function onPlayerUpdate2(_, player)
 				player.Velocity = playerData.SpindashVector * Vector(playerData.SpindashSpeed,playerData.SpindashSpeed)
 				playerData.prevMoveDirection = Vector(0,0)
 				SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Launch"), 1)
+				playerData.SonisAccessSpindashSoundTimer = nil
 				SFXManager():Stop(Isaac.GetSoundIdByName("Sonic Spindash Charge"))
 			elseif player:GetMovementDirection() ~= -1 or playerData.SpindashSpeed < 5 then
 			-- if (player:GetMovementDirection() ~= -1 and player:GetMovementDirection() ~= playerData.SpindashDirection) or playerData.SpindashSpeed < 0.1 then
@@ -388,6 +389,14 @@ local function onPlayerUpdate2(_, player)
 				-- math.ceil((playerData.SpindashSpeed - 5) * 6.66)
 				-- ,100,150,1,1,1,1)
 				if settings.spindashAccessibility then
+					if playerData.SonisAccessSpindashSoundTimer == nil then
+						playerData.SonisAccessSpindashSoundTimer = 10
+					elseif playerData.SonisAccessSpindashSoundTimer > 0 then
+						playerData.SonisAccessSpindashSoundTimer = playerData.SonisAccessSpindashSoundTimer - 1
+					else
+						playerData.SonisAccessSpindashSoundTimer = 10
+						SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Charge"), 1, 0, false, 1 + ((playerData.SpindashSpeed - 10) / 20))
+					end
 					playerData.SpindashSpeed = math.min(20,playerData.SpindashSpeed + (( 1.2 + ( 10 / (player.MaxFireDelay) )) / 15))
 				else
 					playerData.SpindashSpeed = playerData.SpindashSpeed - 0.1
