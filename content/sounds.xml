@@ -2,6 +2,9 @@
 	<sound name="Sonic Jump">
 		<sample weight="1" path="sonicJump.wav"/>
 	</sound>
+	<sound name="Sonic Jump CD">
+		<sample weight="1" path="sonicJumpCD.wav"/>
+	</sound>
 	<sound name="Sonic Hit Enemy">
 		<sample weight="1" path="sonicEnemyHit.wav"/>
 	</sound>

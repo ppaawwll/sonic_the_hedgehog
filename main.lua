@@ -12,6 +12,89 @@ SonicItems = {
 	COLLECTIBLE_SONICSHOES = Isaac.GetItemIdByName("Speed Shoes")
 }
 
+local json = require("json")
+
+local defaultSettings = {
+	spindashAccessibility = false,
+	sonicJumpSound = false -- false = sonic 1/2/3 true = sonic cd 
+}
+
+local settings = {
+}
+
+local function saveSettings()
+	local jsonString = json.encode(settings)
+	SonicCharacterMod:SaveData(jsonString)
+end
+
+local function initializeSettings() -- loads default settings in place of settings that aren't found
+	for k,v in pairs(defaultSettings) do
+		if not settings[k] then
+			settings[k] = defaultSettings[k]
+		end
+	end
+end
+
+local function loadSettings()
+	if not SonicCharacterMod:HasData() then return end
+	
+	local jsonString = SonicCharacterMod:LoadData()
+	settings = json.decode(jsonString)
+end
+
+loadSettings()
+initializeSettings()
+
+local function modConfigMenuInit()
+	if ModConfigMenu == nil then return end
+	
+	ModConfigMenu.RemoveCategory("Sonic INDEV")
+
+	ModConfigMenu.AddSetting(
+		"Sonic INDEV",
+		"Settings",
+		{
+			Type = ModConfigMenu.OptionType.BOOLEAN,
+			CurrentSetting = function()
+				return settings.spindashAccessibility
+			end,
+			Display = function()
+				return "Spindash Mode: " .. (settings.spindashAccessibility and "Hold" or "Mash")
+			end,
+			OnChange = function(s)
+				settings.spindashAccessibility = s
+				saveSettings()
+			end,
+			Info = {
+				"Whether charging a spindash requires buttonmashing or just holding the button.",
+				"This is an accessibility option.",
+			}
+		}
+	)
+
+	ModConfigMenu.AddSetting(
+		"Sonic INDEV",
+		"Settings",
+		{
+			Type = ModConfigMenu.OptionType.BOOLEAN,
+			CurrentSetting = function()
+				return settings.sonicJumpSound
+			end,
+			Display = function()
+				return "Jump Sound: " .. (settings.sonicJumpSound and "Sonic CD" or "Sonic 1/2/3")
+			end,
+			OnChange = function(s)
+				settings.sonicJumpSound = s
+				saveSettings()
+			end,
+			Info = {
+				"The sound used for jumping.",
+			}
+		}
+	)
+end
+
+SonicCharacterMod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, modConfigMenuInit)
 
 function SonicCharacterMod:onCache(player, cacheFlag)
 	local playerData = player:GetData()
@@ -107,6 +190,7 @@ end
 
 local function onPlayerRender(_, player)
 	local playerData = player:GetData()
+	-- Isaac.DrawLine(Isaac.WorldToScreen(player.Position) + Vector(0,-10), Isaac.WorldToScreen(player.Position) + Vector(0,-100),KColor(1,0,0,1),KColor(1,0,0,1),1)
 end
 
 local function getGlobalSonicJumpConfig()
@@ -285,7 +369,8 @@ local function onPlayerUpdate2(_, player)
 		if playerData.ChargingSpindash then
 			local aimingEnough = (math.abs(player:GetAimDirection().X) >= 0.5) or (math.abs(player:GetAimDirection().Y) >= 0.5)
 			-- if player:GetFireDirection() == -1 then
-			if not aimingEnough then
+			-- if not aimingEnough then
+			if not (aimingEnough and not settings.spindashAccessibility) and not (settings.spindashAccessibility and (aimingEnough and Input.GetActionValue(ButtonAction.ACTION_PILLCARD,1) > 0 )) then
 				playerData.SpindashVector = Isaac.GetAxisAlignedUnitVectorFromDir(playerData.SpindashDirection)
 				playerData.ChargingSpindash = false
 				playerData.InSpindash = true
@@ -296,13 +381,17 @@ local function onPlayerUpdate2(_, player)
 			elseif player:GetMovementDirection() ~= -1 or playerData.SpindashSpeed < 5 then
 			-- if (player:GetMovementDirection() ~= -1 and player:GetMovementDirection() ~= playerData.SpindashDirection) or playerData.SpindashSpeed < 0.1 then
 				playerData.ChargingSpindash = false
-			elseif aimingEnough then
+			elseif (aimingEnough and not settings.spindashAccessibility) or (settings.spindashAccessibility and (aimingEnough and Input.GetActionValue(ButtonAction.ACTION_PILLCARD,1) > 0 )) then
 				playerData.SpindashDirection = player:GetFireDirection()
 				-- Isaac.RenderText(playerData.SpindashSpeed,100,150,1,1,1,1)
 				-- Isaac.RenderText( 
 				-- math.ceil((playerData.SpindashSpeed - 5) * 6.66)
 				-- ,100,150,1,1,1,1)
-				playerData.SpindashSpeed = playerData.SpindashSpeed - 0.1
+				if settings.spindashAccessibility then
+					playerData.SpindashSpeed = math.min(20,playerData.SpindashSpeed + (( 1.2 + ( 10 / (player.MaxFireDelay) )) / 15))
+				else
+					playerData.SpindashSpeed = playerData.SpindashSpeed - 0.1
+				end
 				-- Game():SpawnParticles(player.Position,EffectVariant.DARK_BALL_SMOKE_PARTICLE,1,50)
 			end
 		end
@@ -325,6 +414,38 @@ local function onPlayerUpdate2(_, player)
 			if player:GetMovementDirection() ~= -1 or playerData.SpindashSpeed < 5 then
 			-- if (player:GetMovementDirection() ~= -1 and player:GetMovementDirection() ~= playerData.SpindashDirection) or playerData.SpindashSpeed < 0.1 then
 				playerData.InSpindash = false
+			end
+
+			if player.TearFlags & TearFlags.TEAR_HOMING == TearFlags.TEAR_HOMING then
+				-- local entitiesInDirection = {}
+				local closest = nil
+				local closestDistance = 160
+				for i,e in ipairs(Isaac.GetRoomEntities()) do
+					-- if player.Position:Distance(e.Position) <= 160 and
+					if e:ToNPC() and e:ToNPC():IsVulnerableEnemy() and player.Position:Distance(e.Position) < closestDistance and
+					((e.Position.X > player.Position.X and playerData.SpindashDirection == Direction.RIGHT)
+					or (e.Position.Y > player.Position.Y and playerData.SpindashDirection == Direction.DOWN)
+					or (e.Position.X < player.Position.X and playerData.SpindashDirection == Direction.LEFT)
+					or (e.Position.Y < player.Position.Y and playerData.SpindashDirection == Direction.UP))
+					then
+						-- table.insert(entitiesInDirection,e)
+						-- Isaac.DrawLine(Isaac.WorldToScreen(e.Position) + Vector(0,-10), Isaac.WorldToScreen(e.Position) + Vector(0,10),KColor(1,0,0,1),KColor(1,0,0,1),1)
+						closest = e
+						closestDistance = player.Position:Distance(e.Position)
+					end
+				end
+				if closest ~= nil then
+					-- TODO: Fix homing into wall crawlers bumping you into the wall
+					local offset = (closest.Position - player.Position):Clamped(-playerData.SpindashSpeed,-playerData.SpindashSpeed,playerData.SpindashSpeed,playerData.SpindashSpeed)
+					if playerData.SpindashDirection == Direction.RIGHT or playerData.SpindashDirection == Direction.LEFT then
+						player.Position = player.Position + Vector(0,offset.Y)
+					end
+					if playerData.SpindashDirection == Direction.DOWN or playerData.SpindashDirection == Direction.UP then
+						player.Position = player.Position + Vector(offset.X,0)
+					end
+				-- 	Isaac.DrawLine(Isaac.WorldToScreen(e.Position) + Vector(0,-10), Isaac.WorldToScreen(e.Position) + Vector(0,10),KColor(1,0,0,1),KColor(1,0,0,1),1)
+					-- Isaac.DrawLine(Isaac.WorldToScreen(closest.Position) + Vector(0,-10), Isaac.WorldToScreen(closest.Position) + Vector(0,10),KColor(1,0,0,1),KColor(1,0,0,1),1)
+				end
 			end
 		end
 		
@@ -499,7 +620,7 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 	-- math.abs(player:GetAimDirection().Y) >= 0.5
 	-- ))
 
-	local spinIncrease = ( 1.2	 + ( 10 / (player.MaxFireDelay) ))
+	local spinIncrease = ( 1.2 + ( 10 / (player.MaxFireDelay) ))
 	-- local spinIncrease = 30 / (player.MaxFireDelay + 4)
 	local maxSpindashSpeed = 20
 
@@ -507,13 +628,17 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 		playerData.InSpindash = false
 		playerData.alreadyFlying = player:IsFlying()
 		playerData.sonicJumpVelocityY = -5
-		SFXManager():Play(Isaac.GetSoundIdByName("Sonic Jump"), 1)
+		if settings.sonicJumpSound then
+			SFXManager():Play(Isaac.GetSoundIdByName("Sonic Jump CD"), 1)
+		else
+			SFXManager():Play(Isaac.GetSoundIdByName("Sonic Jump"), 1)
+		end
 		local config = getGlobalSonicJumpConfig()
 		JumpLib:Jump(player,config)
 	elseif playerData.ChargingSpindash then
 		-- playerData.SpindashSpeed = playerData.SpindashSpeed + 2
 		playerData.SpindashSpeed = playerData.SpindashSpeed + spinIncrease
-		print(spinIncrease)
+		-- print(spinIncrease)
 		-- print(player.MaxFireDelay)
 		if playerData.SpindashSpeed > maxSpindashSpeed then playerData.SpindashSpeed = maxSpindashSpeed end
 		SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Charge"), 1, 0, false, 1 + ((playerData.SpindashSpeed - 10) / 20))
@@ -737,9 +862,17 @@ local function preGridCollision(_, player, gridIndex, gridEntity)
 				end
 
 				if player:HasCollectible(CollectibleType.COLLECTIBLE_BRIMSTONE) then
-					local brimLaser = player:FireBrimstone(player.Velocity)
+					local brimLaser = player:FireBrimstone(player.Velocity,player)
 					-- local brimLaser = player:FireDelayedBrimstone(player.Velocity:GetAngleDegrees(),nil)
-					brimLaser.Parent = nil
+					-- brimLaser.Parent = nil
+					brimLaser:GetData().SonicIsBrimLaser = true
+					brimLaser:GetData().SonicBrimLaserStaticPos = brimLaser.Position
+					brimLaser:GetData().SonicBrimLaserStaticOffset = Vector(0,0)
+					-- centers it when horizontal
+					if playerData.SpindashDirection == Direction.LEFT or playerData.SpindashDirection == Direction.RIGHT then
+						brimLaser:GetData().SonicBrimLaserStaticOffset = Vector(0,-15)
+					end
+					brimLaser.PositionOffset = brimLaser:GetData().SonicBrimLaserStaticOffset
 					-- brimLaser:AddTearFlags(player.TearFlags)
 					-- brimLaser.TearFlags = player.TearFlags
 				end
@@ -758,6 +891,15 @@ end
 
 -- TODO: make tears hit sonic while hes jumping if its high enough
 
+local function onLaserUpdate(_, lasere)
+	if lasere:GetData().SonicIsBrimLaser then
+		lasere.Position = lasere:GetData().SonicBrimLaserStaticPos
+		-- both of these to keep the fucking thing still
+		lasere.ParentOffset = lasere:GetData().SonicBrimLaserStaticPos - lasere.Parent.Position
+		lasere.PositionOffset = lasere:GetData().SonicBrimLaserStaticOffset
+	end
+end
+
 SonicCharacterMod:AddCallback(ModCallbacks.MC_POST_RENDER, onRender)
 SonicCharacterMod:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, onPlayerUpdate)
 SonicCharacterMod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, onPlayerUpdate2)
@@ -771,3 +913,4 @@ SonicCharacterMod:AddCallback(ModCallbacks.MC_PRE_PROJECTILE_COLLISION, onTearCo
 SonicCharacterMod:AddCallback(ModCallbacks.MC_PRE_PLAYER_RENDER, prePlayerRender)
 SonicCharacterMod:AddCallback(ModCallbacks.MC_PRE_PLAYER_GRID_COLLISION, preGridCollision)
 SonicCharacterMod:AddCallback(ModCallbacks.MC_PRE_PROJECTILE_COLLISION, preProjectileCollision)
+SonicCharacterMod:AddCallback(ModCallbacks.MC_POST_LASER_RENDER, onLaserUpdate)
