@@ -1,4 +1,4 @@
-Spoon Bender - Makes spindashing home in on enemies
+Spoon Bender - Makes spindashing home in on enemies ✅
 Cupid's Arrow?
 Dr. Fetus - Explodes when you hit enemies ✅
 Technology
@@ -28,11 +28,11 @@ Cursed Eye
 Mysterious Liquid
 Epiphora
 Continuum?
-Dead Eye
+Dead Eye - The multiplier builds as you land on enemies without landing on the ground ✅
 Holy Light!
 Tear Detonator?
 Marked
-Tech X - Spawns laser rings around you when spin attacking
+Tech X - Spawns laser rings around you when spindashing, spawns non-following laser rings when jumping and landing on enemies ✅
 Tractor Beam
 Explosivo
 Head of the Keeper

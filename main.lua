@@ -46,6 +46,7 @@ loadSettings()
 initializeSettings()
 
 local function modConfigMenuInit()
+---@diagnostic disable-next-line: undefined-global
 	if ModConfigMenu == nil then return end
 	
 	ModConfigMenu.RemoveCategory("Sonic INDEV")
@@ -94,7 +95,9 @@ local function modConfigMenuInit()
 	)
 end
 
-SonicCharacterMod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, modConfigMenuInit)
+modConfigMenuInit()
+
+SonicCharacterMod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, loadSettings)
 
 function SonicCharacterMod:onCache(player, cacheFlag)
 	local playerData = player:GetData()
@@ -237,6 +240,11 @@ local function onPlayerUpdate2(_, player)
 	if player:HasCollectible(SonicItems.COLLECTIBLE_SONICJUMP) and not playerData.SonicSpindashChargeSprite then
 		playerData.SonicSpindashChargeSprite = Sprite()
 		playerData.SonicSpindashChargeSprite:Load("gfx/chargebar_sonic.anm2")
+	end
+	if player:HasCollectible(SonicItems.COLLECTIBLE_SONICJUMP) and not playerData.SonicDeadEyeSprite then
+		playerData.SonicDeadEyeSprite = Sprite()
+		playerData.SonicDeadEyeSprite:Load("gfx/deadeyeteareffect.anm2")
+		playerData.SonicDeadEyeSprite:Play("Idle",true)
 	end
 	local ballDirection = player:GetMovementDirection()
 	if playerData.InSpindash or playerData.ChargingSpindash then
@@ -546,6 +554,10 @@ local function prePlayerRender(_, player, offset)
 				playerData.SonicDustSprite:Render(Isaac.WorldToScreen(player.Position) + Vector(-2,2))
 			end
 		end
+		if playerData.SonicDeadEyeSprite and player:HasCollectible(CollectibleType.COLLECTIBLE_DEAD_EYE)then
+			playerData.SonicDeadEyeSprite.Color = Color(1,1,1,player:GetDeadEyeCharge() / 6)
+			playerData.SonicDeadEyeSprite:Render(Isaac.WorldToScreen(player.Position) - Vector(0,jumpData.Height + 14))
+		end
 		return false
 	end
 
@@ -632,6 +644,7 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 	local spinIncrease = ( 1.2 + ( 10 / (player.MaxFireDelay) ))
 	-- local spinIncrease = 30 / (player.MaxFireDelay + 4)
 	local maxSpindashSpeed = 20
+	local jumpedOrDashed = false
 
 	if not aimingEnough then
 		playerData.InSpindash = false
@@ -644,6 +657,11 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 		end
 		local config = getGlobalSonicJumpConfig()
 		JumpLib:Jump(player,config)
+		if player:HasCollectible(CollectibleType.COLLECTIBLE_TECH_X) then
+			local techXLaser = player:FireTechXLaser(player.Position,Vector(0,0),40,player)
+			techXLaser:GetData().SonicIsTechXLaser = true
+			techXLaser.Timeout = 30
+		end
 	elseif playerData.ChargingSpindash then
 		-- playerData.SpindashSpeed = playerData.SpindashSpeed + 2
 		playerData.SpindashSpeed = playerData.SpindashSpeed + spinIncrease
@@ -658,6 +676,14 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 		playerData.SpindashSpeed = math.min(8 + spinIncrease, maxSpindashSpeed)
 		-- SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Charge"), 1, 0, false, 1)
 		SFXManager():Play(Isaac.GetSoundIdByName("Sonic Spindash Charge"), 1, 0, false, 1 + ((playerData.SpindashSpeed - 10) / 20))
+
+		if player:HasCollectible(CollectibleType.COLLECTIBLE_TECH_X) then
+			local techXLaser = player:FireTechXLaser(player.Position,Vector(0,0),40,player)
+			techXLaser:GetData().SonicIsSpindashTechXLaser = true
+			techXLaser:AddTearFlags(TearFlags.TEAR_SPECTRAL)
+			-- techXLaser.PositionOffset = Vector(0,0)
+			-- print(JumpLib:GetData(techXLaser).Height)
+		end
 		-- playerData.SpindashSoundTimer = 9
 		-- -- playerData.SpindashSpeed = 10
 		-- player.Velocity = playerData.SpindashVector * Vector(playerData.SpindashSpeed,playerData.SpindashSpeed)
@@ -666,7 +692,6 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 
 		-- player.Friction = 2
 	end
-
 end
 
 function SonicCharacterMod:onSonicHit(player,enemy,spindash)
@@ -680,6 +705,19 @@ function SonicCharacterMod:onSonicHit(player,enemy,spindash)
 			if explosionDamage > 60 then explosionDamage = (player.Damage * 5) + 30 end
 		end
 		Isaac.Explode(player.Position,player,explosionDamage)
+	end
+
+	if player:HasCollectible(CollectibleType.COLLECTIBLE_DEAD_EYE) and not spindash then
+		player:AddDeadEyeCharge()
+	end
+
+	if player:HasCollectible(CollectibleType.COLLECTIBLE_TECH_X) and not spindash then
+		local techXLaser = player:FireTechXLaser(player.Position,Vector(0,0),40,player)
+		techXLaser:GetData().SonicIsTechXLaser = true
+		techXLaser.Timeout = 10
+		techXLaser.PositionOffset = Vector(0,0)
+		-- print(JumpLib:GetData(techXLaser).Height)
+		print(techXLaser.Height)
 	end
 
 	local tearAngleArray = {}
@@ -875,8 +913,9 @@ local function preGridCollision(_, player, gridIndex, gridEntity)
 					-- local brimLaser = player:FireDelayedBrimstone(player.Velocity:GetAngleDegrees(),nil)
 					-- brimLaser.Parent = nil
 					brimLaser:GetData().SonicIsBrimLaser = true
-					brimLaser:GetData().SonicBrimLaserStaticPos = brimLaser.Position
+					-- brimLaser:GetData().SonicBrimLaserStaticPos = brimLaser.Position
 					brimLaser:GetData().SonicBrimLaserStaticOffset = Vector(0,0)
+					brimLaser.DisableFollowParent = true
 					-- centers it when horizontal
 					if playerData.SpindashDirection == Direction.LEFT or playerData.SpindashDirection == Direction.RIGHT then
 						brimLaser:GetData().SonicBrimLaserStaticOffset = Vector(0,-15)
@@ -902,10 +941,29 @@ end
 
 local function onLaserUpdate(_, lasere)
 	if lasere:GetData().SonicIsBrimLaser then
-		lasere.Position = lasere:GetData().SonicBrimLaserStaticPos
-		-- both of these to keep the fucking thing still
-		lasere.ParentOffset = lasere:GetData().SonicBrimLaserStaticPos - lasere.Parent.Position
+	-- 	lasere.Position = lasere:GetData().SonicBrimLaserStaticPos
+	-- 	-- both of these to keep the fucking thing still
+	-- 	lasere.ParentOffset = lasere:GetData().SonicBrimLaserStaticPos - lasere.Parent.Position
 		lasere.PositionOffset = lasere:GetData().SonicBrimLaserStaticOffset
+	end
+	if lasere:GetData().SonicIsTechXLaser then
+		-- lasere.ParentOffset = Vector(0,0)
+		lasere.PositionOffset = Vector(0,0)
+	end
+	if lasere:GetData().SonicIsSpindashTechXLaser then
+		-- lasere.ParentOffset = Vector(0,0)
+		local playerData = lasere.Parent:GetData()
+		lasere.Position = lasere.Parent.Position
+		if not (playerData.InSpindash or playerData.ChargingSpindash) then
+			lasere.Timeout = 1
+		end
+	end
+end
+
+local function onSonicLand(_, player, data, pitfall)
+	-- player = player:ToPlayer()
+	while player:GetDeadEyeCharge() > 0 do
+		player:ClearDeadEyeCharge()
 	end
 end
 
@@ -923,3 +981,6 @@ SonicCharacterMod:AddCallback(ModCallbacks.MC_PRE_PLAYER_RENDER, prePlayerRender
 SonicCharacterMod:AddCallback(ModCallbacks.MC_PRE_PLAYER_GRID_COLLISION, preGridCollision)
 SonicCharacterMod:AddCallback(ModCallbacks.MC_PRE_PROJECTILE_COLLISION, preProjectileCollision)
 SonicCharacterMod:AddCallback(ModCallbacks.MC_POST_LASER_RENDER, onLaserUpdate)
+SonicCharacterMod:AddCallback(JumpLib.Callbacks.ENTITY_LAND, onSonicLand, {
+	tag = "SonicCharacterMod_SpinJump",
+type = EntityType.ENTITY_PLAYER})
