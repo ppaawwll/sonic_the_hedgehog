@@ -209,42 +209,35 @@ end
 local function onPlayerUpdate2(_, player)
 	local playerData = player:GetData()
 	local jumpData = JumpLib:GetData(player)
-	-- if playerData.superSpeed == nil then
-		-- playerData.superSpeed = true
-	-- end
-	-- if playerData.superSpeed == true then
-		-- playerData.superSpeed = false
-		-- player:Update()
-	-- else
-		-- playerData.superSpeed = true
-	-- end
 	
 	-- if the game's paused dont do shit!!
 	-- TODO: put this in its own "evaluateSpinjumpSprite()" function
-	if player:HasCollectible(SonicItems.COLLECTIBLE_SONICJUMP) and not playerData.SonicBallSprite then
-		playerData.SonicBallSprite = Sprite()
-		playerData.SonicBallSprite:Load("gfx/characters/sprite_sonic_ball.anm2")
-		if player:GetName() == "Sonic" then
-			playerData.SonicBallSprite:ReplaceSpritesheet(0, "gfx/characters/sonic_spinball_sonic.png")
-			playerData.SonicBallSprite:LoadGraphics()
+	if player:HasCollectible(SonicItems.COLLECTIBLE_SONICJUMP) then
+		if not playerData.SonicBallSprite then
+			playerData.SonicBallSprite = Sprite()
+			playerData.SonicBallSprite:Load("gfx/characters/sprite_sonic_ball.anm2")
+			if player:GetName() == "Sonic" then
+				playerData.SonicBallSprite:ReplaceSpritesheet(0, "gfx/characters/sonic_spinball_sonic.png")
+				playerData.SonicBallSprite:LoadGraphics()
+			end
+			-- playerData.SonicBallSprite:Play("Idle", true)
+			-- print("oenis")
 		end
-		-- playerData.SonicBallSprite:Play("Idle", true)
-		-- print("oenis")
-	end
-	if player:HasCollectible(SonicItems.COLLECTIBLE_SONICJUMP) and not playerData.SonicDustSprite then
-		playerData.SonicDustSprite = Sprite()
-		playerData.SonicDustSprite:Load("gfx/effect_spindashChargeDust.anm2")
-		playerData.SonicDustSprite:Play("Idle", true)
-		-- print("oenis")
-	end
-	if player:HasCollectible(SonicItems.COLLECTIBLE_SONICJUMP) and not playerData.SonicSpindashChargeSprite then
-		playerData.SonicSpindashChargeSprite = Sprite()
-		playerData.SonicSpindashChargeSprite:Load("gfx/chargebar_sonic.anm2")
-	end
-	if player:HasCollectible(SonicItems.COLLECTIBLE_SONICJUMP) and not playerData.SonicDeadEyeSprite then
-		playerData.SonicDeadEyeSprite = Sprite()
-		playerData.SonicDeadEyeSprite:Load("gfx/deadeyeteareffect.anm2")
-		playerData.SonicDeadEyeSprite:Play("Idle",true)
+		if not playerData.SonicDustSprite then
+			playerData.SonicDustSprite = Sprite()
+			playerData.SonicDustSprite:Load("gfx/effect_spindashChargeDust.anm2")
+			playerData.SonicDustSprite:Play("Idle", true)
+			-- print("oenis")
+		end
+		if not playerData.SonicSpindashChargeSprite then
+			playerData.SonicSpindashChargeSprite = Sprite()
+			playerData.SonicSpindashChargeSprite:Load("gfx/chargebar_sonic.anm2")
+		end
+		if not playerData.SonicDeadEyeSprite then
+			playerData.SonicDeadEyeSprite = Sprite()
+			playerData.SonicDeadEyeSprite:Load("gfx/deadeyeteareffect.anm2")
+			playerData.SonicDeadEyeSprite:Play("Idle",true)
+		end
 	end
 	local ballDirection = player:GetMovementDirection()
 	if playerData.InSpindash or playerData.ChargingSpindash then
@@ -360,18 +353,6 @@ local function onPlayerUpdate2(_, player)
 			playerData.sonicBriefInvul = playerData.sonicBriefInvul - 1
 		end
 
-		-- if not playerData.SpeedFuck then
-		-- 	playerData.SpeedFuck = 1
-		-- else
-		-- 	playerData.SpeedFuck = playerData.SpeedFuck - 1
-		-- 	if playerData.SpeedFuck <= 0 then
-		-- 		if player.Velocity:Length() > 10 	then
-		-- 			player:CreateAfterimage(10,player.Position)
-		-- 		end
-		-- 		playerData.SpeedFuck = 3
-		-- 	end
-		-- end
-
 		-- player:CreateAfterimage(10,player.Position)
 
 		if playerData.ChargingSpindash then
@@ -414,11 +395,6 @@ local function onPlayerUpdate2(_, player)
 		end
 
 		if playerData.InSpindash then
-			-- playerData.ChargingSpindash = false
-			-- player:MultiplyFriction(1.11)
-			-- player:MultiplyFriction(1.1)
-			-- player:MultiplyFriction(1.05)
-			-- player.Size = 20
 			while player.Velocity:Length() < playerData.SpindashSpeed do
 			-- if player.Velocity:Length() < 20 then
 				-- player.Velocity = player.Velocity + playerData.SpindashVector * Vector(20 - player.Velocity:Length(),20 - player.Velocity:Length())
@@ -465,36 +441,12 @@ local function onPlayerUpdate2(_, player)
 				end
 			end
 		end
-		
-		-- local moveInputAngle = player:GetMovementInput():GetAngleDegrees()
-		-- local velocityAngle = player.Velocity:GetAngleDegrees()
-		-- -- Isaac.RenderText((player:GetMovementInput() + player.Velocity):Length()	,100,150,1,1,1,1)
-		-- Isaac.RenderText((player.Velocity):Length()	,100,150,1,1,1,1)
-		-- -- if player.Velocity:Length() > 1 and () then
-		-- if  player.Velocity:Length() > 5.5 and (player:GetMovementInput() + player.Velocity:Normalized()):Length() < 0.1 then
-			-- SFXManager():Play(Isaac.GetSoundIdByName("Sonic Skid"), 1,2)
-		-- end
-		
-		-- if playerData.SpindashSoundTimer > 0 then
-			-- playerData.SpindashSoundTimer = playerData.SpindashSoundTimer - 1
-		-- end
 	end
 end
 
 local function prePlayerRender(_, player, offset)
-	-- if not Game():IsPaused() then
 	local playerData = player:GetData()
 	local jumpData = JumpLib:GetData(player)
-	-- player:GetSprite().Color:SetOffset(-1,0,0)
-		-- if playerData.sonicJumpY ~= nil and playerData.sonicJumpY > 0 or playerData.sonicJumpVelocityY < 0 then
-			-- return false
-		-- end
-	-- end
-	
-	-- player:Render(Vector(30,0))
-	-- player:GetSprite():Render(Isaac.WorldToScreen(player.Position) + Vector(0,5))
-	-- player:GetSprite():RenderLayer(1,Isaac.WorldToScreen(player.Position) + Vector(30,0))
-	-- print(player:GetSprite():GetLayerCount())
 
 	if player:GetName() == "Sonic" and player:GetSprite():GetAnimation() == "Death" then
 		playerData.SonicDeathSprite:Render(Isaac.WorldToScreen(player.Position) + Vector(0,playerData.SonicDeathSpriteY))
@@ -502,9 +454,6 @@ local function prePlayerRender(_, player, offset)
 		return false
 	end
 
-	-- playerData.SonicDeathSprite:Render(Isaac.WorldToScreen(player.Position) + Vector(0,0))
-
-	-- if playerData.sonicJumpY ~= nil and playerData.sonicJumpY > 1 then
 	-- TODO: make the ball sprite's tint match the base sprite's tint
 	if (jumpData.Jumping and jumpData.Tags["SonicCharacterMod_SpinJump"]) or (playerData.InSpindash or playerData.ChargingSpindash) then
 		-- playerData.SonicBallSprite:RenderLayer(0, Isaac.WorldToScreen(player.Position) - Vector(0,playerData.sonicJumpY))
@@ -609,37 +558,14 @@ local function prePlayerRender(_, player, offset)
 			end
 		end
 	end
-	
-	-- if playerData.sonicJumpY ~= nil and playerData.sonicJumpY <= 1 then
-		-- -- player:GetSprite().Color = Color(1,1,1,0.00000001)
-		-- -- player:GetSprite().Color = Color(1,1,1,1)
-	-- end
-	
-	-- player:RenderHead(player.Position + Vector(10,0))
-	-- end
 end
-
--- local function initiateSpindash (_, player, speed, direction)
-
--- end
-
--- local function sonicSpinSound(_, player, pitch)
 
 function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 	local playerData = player:GetData()
 	local aimingEnough = (math.abs(player:GetAimDirection().X) >= 0.5) or (math.abs(player:GetAimDirection().Y) >= 0.5)
+
 	-- only jump if on the ground
-	-- if playerData.sonicJumpY > 0 then return end
 	if not JumpLib:CanJump(player) then return end
-	-- print(tostring(player:GetFireDirection()))
-	-- print(aimingEnough)
-	-- print(tostring(player:GetAimDirection())
-	-- .. " " .. tostring(
-	-- math.abs(player:GetAimDirection().X) >= 0.5
-	-- )
-	-- .. " " .. tostring(
-	-- math.abs(player:GetAimDirection().Y) >= 0.5
-	-- ))
 
 	local spinIncrease = ( 1.2 + ( 10 / (player.MaxFireDelay) ))
 	-- local spinIncrease = 30 / (player.MaxFireDelay + 4)
@@ -684,13 +610,6 @@ function SonicCharacterMod:useSonicJump(item, RNG, player, useflags, slot)
 			-- techXLaser.PositionOffset = Vector(0,0)
 			-- print(JumpLib:GetData(techXLaser).Height)
 		end
-		-- playerData.SpindashSoundTimer = 9
-		-- -- playerData.SpindashSpeed = 10
-		-- player.Velocity = playerData.SpindashVector * Vector(playerData.SpindashSpeed,playerData.SpindashSpeed)
-		-- -- player:MultiplyFriction(2)
-		-- playerData.InSpindash = true
-
-		-- player.Friction = 2
 	end
 end
 
@@ -809,10 +728,8 @@ local function onNPCCollision(_, npc, collider, low)
 	
 end
 
--- TODO: make jumping on non-movable tnt damage it
 -- TODO: make jumping over damaging gridentities without taking damage possible
 -- TODO: same with brimstone lasers
--- TODO: make ball size match player size
 
 local function onPlayerTakeDmg(_, player, amount, flags, source, countdown)
 	local playerData = player:GetData()
@@ -869,26 +786,7 @@ end
 local function preGridCollision(_, player, gridIndex, gridEntity)
 	local playerData = player:GetData()
 	local jumpData = JumpLib:GetData(player)
-	-- if player:GetName() == "ppaawwll" and gridEntity:GetType() == GridEntityType.GRID_POOP then
-		-- touchedGross(player)
-	-- end
-	-- if not Game():IsPaused() then
-	-- if jumpData.Jumping and jumpData.Tags["SonicCharacterMod_SpinJump"] then
-		-- -- gets the gridentity currently below the player
-		-- -- local gridUnder = Game():GetRoom():GetGridEntityFromPos(player.Position)
-		
-		-- -- if there's something under us and it's poop (TODO: add bouncing on TNT as well) and it's destroyed (state 1000 for some reason), and we're low enough to bounce on it, do that
-		-- -- if gridUnder ~= nil and (gridUnder:GetType() == GridEntityType.GRID_POOP and gridUnder.State < 1000) and jumpData.Height < 10 then
-		-- if gridEntity ~= nil and (gridEntity:GetType() == GridEntityType.GRID_POOP and gridEntity.State < 1000) and jumpData.Height < 10 then
-			-- gridEntity:Hurt(2)
-			-- local config = getGlobalSonicJumpConfig()
-			-- config.Height = 8.16
-			-- JumpLib:Jump(player,config)
-			-- SFXManager():Play(Isaac.GetSoundIdByName("Sonic Hit Enemy"), 1)
-		-- end
-	-- end
-	-- print(gridEntity:GetType())
-	-- if playerData.InSpindash and gridEntity ~= nil and playerData.SpindashSpeed > 8 then
+
 	if playerData.InSpindash and gridEntity ~= nil then
 		if gridEntity:GetType() == GridEntityType.GRID_WALL or gridEntity:GetType() == GridEntityType.GRID_PIT or gridEntity:GetType() == GridEntityType.GRID_ROCKB or gridEntity:GetType() == GridEntityType.GRID_LOCK or playerData.SpindashSpeed < 8 then
 			playerData.InSpindash = false
