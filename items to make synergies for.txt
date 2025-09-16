@@ -1,74 +1,86 @@
-08/87
-
 Spoon Bender - Makes spindashing home in on enemies ✅
-Cupid's Arrow?
+Cupid's Arrow???
 Dr. Fetus - Explodes when you hit enemies ✅
 Technology
-Chocolate Milk
-Mom's Knife
+Chocolate Milk???
+Mom's Knife - Lets him use the knife like normal ✅
 Brimstone - Shoots brimstone lasers when you dash into walls ✅
-A Lump of Coal
+A Lump of Coal - Spindashes do not decrease in damage as they travel, and in fact increases ✅
 Ipecac - Explodes when you hit enemies ✅
 Tough Love
+The Mulligan - 1/6 chance to create blue flies on hit ✅
 Technology 2
-Chemical Peel
-The Peeper?
+Chemical Peel - +2 damage every other hit ✅
+The Peeper - +35% damage every other hit ✅
 Epic Fetus
 Sacred Heart - Damaging aura around your spinattacks (and also homing)
-Mom's Wig
+Midas Touch - Percent chance to turn enemies into gold on hit
+Mom's Wig - Chance to create blue spiders on hit
+Rubber Cement - Spinattacks bounce off walls (reversing direction while spindashing, and "jumping" off walls while spinjumping)
 Anti-Gravity
-Monstro's Lung?
-Tiny Planet?
-E. Coli
+Monstro's Lung???
+Tiny Planet???
+E. Coli - Percent chance to turn enemies into poop on hit
 Tech.5
-Blood Clot
-Fire Mind
-Proptosis
-Rotten Baby
-Strange Attractor
-Cursed Eye
-Mysterious Liquid
-Epiphora
-Continuum?
+Blood Clot - +1 damage every other hit ✅
+Fire Mind - Sets enemies on fire on hit. Chance to explode
+Proptosis - Ultras-short-range spindashes but ultra high damage
+Strange Attractor - Things are attracted to you as a ball
+Cursed Eye???
+Mysterious Liquid - Leaves creep on hit and jump (maybe while spindashing too idk)
+Epiphora???
+Continuum - Spindashes ignore walls and lets you screen wrap?
 Dead Eye - The multiplier builds as you land on enemies without landing on the ground ✅
-Holy Light!
-Tear Detonator?
-Marked
+Tear Detonator - Tammy's head effect, in addition to its normal effect, but only while a ball
+Marked???
 Tech X - Spawns laser rings around you when spindashing, spawns non-following laser rings when jumping and landing on enemies ✅
-Tractor Beam
-Explosivo
-Head of the Keeper
-Kidney Stone?
-Sinus Infection
+Tractor Beam???
+Explosivo - Chance to spawn an explosivo tear that sticks to the enemy you hit
+Head of the Keeper - Chance to drop pennies on hit
+Kidney Stone???
+Sinus Infection - Chance to spawn a booger tear that sticks to the enemy you hit
 Eye of Belial
-Analog Stick
+Analog Stick - Allows you to spindash in any direction?
 Jacob's Ladder
-Euthanasia
+Ghost Pepper
 Camo Undies
 Large Zit
+Technology Zero
+Pop!???	
+Lachryphagy???
+Trisagion
+Flat Stone
+Mucormycosis - Chance to spawn a fungus tear that sticks to the enemy you hit
 Eye of the Occult
-Spirit Sword
-Terra
-Eye Drops
-The Scooper
+Spirit Sword - Lets him use the sword like normal ✅
+Terra - Random damage modif on hit, also can destroy rocks by jumping on them
+The Scooper - x1.5 damage every other other hit (when used) ✅
+Bird's Eye
+Giant Cell?
+C Section???
+IBS?
+Stye - +28% damage every other other hit ✅
 
 - Applies Stat Effects/Chance Based Tears:
 The Common Cold
 Mom's Contacts
 Mom's Eyeshadow
 Iron Bar
-Midas Touch
 Ball of Tar
 Dark Matter
+Holy Light!
 Serpent's Kiss
 Fruit Cake
 Eye of Greed?
 Glaucoma
 Parasitoid
+Euthanasia
 Little Horn
-Mucormycosis
 Playdough Cookie
 Uranus
+Lodestone
+Rotten Tomato
+Knockout Drops
 
 Pinky Eye
 Black Tooth
@@ -79,7 +91,7 @@ Teardrop Charm
 Brain Worm
 Torn Card?
 
-- Multishot - Shoots tears when hitting enemies?:
+- Multishot - Shoots tears when jumping/spindashing?:
 The Inner Eye
 Mom's Eye
 Loki's Horns
@@ -92,5 +104,5 @@ Immaculate Heart
 - Shot Fracture - Shoots tears when hitting enemies:
 The Parasite ✅
 Cricket's Body ✅
-Compound Fracture
-Haemolacria
+Compound Fracture ✅
+Haemolacria ✅
