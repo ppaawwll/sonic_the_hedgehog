@@ -1,13 +1,12 @@
 Spoon Bender - Makes spindashing home in on enemies ✅
 Cupid's Arrow???
 Dr. Fetus - Explodes when you hit enemies ✅
-Technology
+Technology - Spawns a laser ring around you when spinattacking ✅ (ring is thick, that needs fixing somehow)
 Chocolate Milk???
 Mom's Knife - Lets him use the knife like normal ✅
 Brimstone - Shoots brimstone lasers when you dash into walls ✅
 A Lump of Coal - Spindashes do not decrease in damage as they travel, and in fact increases ✅
 Ipecac - Explodes when you hit enemies ✅
-Tough Love
 The Mulligan - 1/6 chance to create blue flies on hit ✅
 Technology 2
 Chemical Peel - +2 damage every other hit ✅
@@ -16,8 +15,8 @@ Epic Fetus
 Sacred Heart - Damaging aura around your spinattacks (and also homing)
 Midas Touch - Percent chance to turn enemies into gold on hit
 Mom's Wig - Chance to create blue spiders on hit
-Rubber Cement - Spinattacks bounce off walls (reversing direction while spindashing, and "jumping" off walls while spinjumping)
-Anti-Gravity
+Rubber Cement - Spinattacks bounce off walls (reversing direction while spindashing, and "jumping" off walls while spinjumping) ✅
+Anti-Gravity???
 Monstro's Lung???
 Tiny Planet???
 E. Coli - Percent chance to turn enemies into poop on hit
@@ -33,14 +32,14 @@ Continuum - Spindashes ignore walls and lets you screen wrap?
 Dead Eye - The multiplier builds as you land on enemies without landing on the ground ✅
 Tear Detonator - Tammy's head effect, in addition to its normal effect, but only while a ball
 Marked???
-Tech X - Spawns laser rings around you when spindashing, spawns non-following laser rings when jumping and landing on enemies ✅
+Tech X - Spawns non-following laser rings when jumping and landing on enemies ✅
 Tractor Beam???
 Explosivo - Chance to spawn an explosivo tear that sticks to the enemy you hit
 Head of the Keeper - Chance to drop pennies on hit
 Kidney Stone???
 Sinus Infection - Chance to spawn a booger tear that sticks to the enemy you hit
 Eye of Belial
-Analog Stick - Allows you to spindash in any direction?
+Analog Stick - Allows you to spindash in any direction ✅
 Jacob's Ladder
 Ghost Pepper
 Camo Undies
@@ -49,9 +48,9 @@ Technology Zero
 Pop!???	
 Lachryphagy???
 Trisagion
-Flat Stone
+Flat Stone - You "skip" on the floor like the tear does when you spindash, dealing AoE damage
 Mucormycosis - Chance to spawn a fungus tear that sticks to the enemy you hit
-Eye of the Occult
+Eye of the Occult - Spindashes can be steered using the fire buttons
 Spirit Sword - Lets him use the sword like normal ✅
 Terra - Random damage modif on hit, also can destroy rocks by jumping on them
 The Scooper - x1.5 damage every other other hit (when used) ✅
@@ -62,31 +61,35 @@ IBS?
 Stye - +28% damage every other other hit ✅
 
 - Applies Stat Effects/Chance Based Tears:
-The Common Cold
-Mom's Contacts
-Mom's Eyeshadow
-Iron Bar
-Ball of Tar
-Dark Matter
+Spider Bite ✅
+The Common Cold ✅
+Mom's Contacts ✅
+Tough Love 
+Mom's Eyeshadow ✅
+Iron Bar ✅
+Ball of Tar ✅
+Dark Matter ✅
 Holy Light!
-Serpent's Kiss
+Serpent's Kiss ✅
+God's Flesh
 Fruit Cake
+Apple!
 Eye of Greed?
 Glaucoma
 Parasitoid
 Euthanasia
 Little Horn
 Playdough Cookie
-Uranus
-Lodestone
-Rotten Tomato
+Uranus ✅
+Lodestone ✅
+Rotten Tomato ✅
 Knockout Drops
 
-Pinky Eye
+Pinky Eye ✅
 Black Tooth
 Nose Goblin
 Jawbreaker
-Chewed Pen
+Chewed Pen ✅
 Teardrop Charm
 Brain Worm
 Torn Card?
@@ -106,3 +109,6 @@ The Parasite ✅
 Cricket's Body ✅
 Compound Fracture ✅
 Haemolacria ✅
+
+-10
+32/104
