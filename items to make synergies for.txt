@@ -2,7 +2,7 @@ Spoon Bender - Makes spindashing home in on enemies ✅
 Cupid's Arrow???
 Dr. Fetus - Explodes when you hit enemies ✅
 Technology - Spawns a laser ring around you when spinattacking ✅ (ring is thick, that needs fixing somehow)
-Chocolate Milk???
+Chocolate Milk??? - Second charge for damage multiplier, speeds up charge a lot
 Mom's Knife - Lets him use the knife like normal ✅
 Brimstone - Shoots brimstone lasers when you dash into walls ✅
 A Lump of Coal - Spindashes do not decrease in damage as they travel, and in fact increases ✅
@@ -12,93 +12,94 @@ Technology 2
 Chemical Peel - +2 damage every other hit ✅
 The Peeper - +35% damage every other hit ✅
 Epic Fetus
-Sacred Heart - Damaging aura around your spinattacks (and also homing)
-Midas Touch - Percent chance to turn enemies into gold on hit
-Mom's Wig - Chance to create blue spiders on hit
+Godhead - Damaging aura around your spinattacks (and also homing) ✅
+Midas Touch - Percent chance to turn enemies into gold on hit ✅
+Mom's Wig - Chance to create blue spiders on hit ✅
 Rubber Cement - Spinattacks bounce off walls (reversing direction while spindashing, and "jumping" off walls while spinjumping) ✅
-Anti-Gravity???
-Monstro's Lung???
-Tiny Planet???
-E. Coli - Percent chance to turn enemies into poop on hit
+Anti-Gravity??? - Spawns tears when spindashing, releases them when it stops
+Tiny Planet??? - Destroyed rocks become orbiting projectiles during dash
+E. Coli - Percent chance to turn enemies into poop on hit ✅
 Tech.5
 Blood Clot - +1 damage every other hit ✅
-Fire Mind - Sets enemies on fire on hit. Chance to explode
-Proptosis - Ultras-short-range spindashes but ultra high damage
+Fire Mind - Sets enemies on fire on hit. Chance to explode ✅
+Proptosis - Ultra-short-range spindashes but ultra high damage (implemented, but needs a lot of tweaking)
 Strange Attractor - Things are attracted to you as a ball
-Cursed Eye???
-Mysterious Liquid - Leaves creep on hit and jump (maybe while spindashing too idk)
+Cursed Eye??? - Leaves a trail of damaging afterimages? Perhaps a burst of tears on spindash release?
+Mysterious Liquid - Leaves creep on hit and jump (maybe while spindashing too idk) ✅
 Epiphora???
 Continuum - Spindashes ignore walls and lets you screen wrap?
 Dead Eye - The multiplier builds as you land on enemies without landing on the ground ✅
-Tear Detonator - Tammy's head effect, in addition to its normal effect, but only while a ball
-Marked???
+Tear Detonator - Tammy's head effect, in addition to its normal effect, but only while a ball ✅
+Marked??? - Just make it affect any tears spawned by other affects
 Tech X - Spawns non-following laser rings when jumping and landing on enemies ✅
 Tractor Beam???
-Explosivo - Chance to spawn an explosivo tear that sticks to the enemy you hit
+Explosivo - Chance to spawn an explosivo tear that sticks to the enemy you hit ✅
 Head of the Keeper - Chance to drop pennies on hit
 Kidney Stone???
-Sinus Infection - Chance to spawn a booger tear that sticks to the enemy you hit
-Eye of Belial
+Sinus Infection - Chance to spawn a booger tear that sticks to the enemy you hit ✅
+Eye of Belial - When spindashing, becomes homing after hitting an enemy
 Analog Stick - Allows you to spindash in any direction ✅
-Jacob's Ladder
+Jacob's Ladder - Create sparks when hitting things
 Ghost Pepper
-Camo Undies
-Large Zit
-Technology Zero
-Pop!???	
+Camo Undies - Works as normal, but also reveals when you jump ✅
+Large Zit - Chance to shoot a zit tear when you hit enemies ✅
+Technology Zero -  Chain lightning between any copies or afterimages of sonic
+Pop!??? - let the man roll   
 Lachryphagy???
-Trisagion
-Flat Stone - You "skip" on the floor like the tear does when you spindash, dealing AoE damage
-Mucormycosis - Chance to spawn a fungus tear that sticks to the enemy you hit
+Trisagion???
+Flat Stone - You "skip" on the floor like the tear does when you spindash, dealing AoE damage ✅
+Mucormycosis - Chance to spawn a fungus tear that sticks to the enemy you hit ✅
 Eye of the Occult - Spindashes can be steered using the fire buttons
 Spirit Sword - Lets him use the sword like normal ✅
 Terra - Random damage modif on hit, also can destroy rocks by jumping on them
 The Scooper - x1.5 damage every other other hit (when used) ✅
 Bird's Eye
-Giant Cell?
+Giant Cell? - MORE TINY SONICS
 C Section???
 IBS?
 Stye - +28% damage every other other hit ✅
+
+Brain Worm
 
 - Applies Stat Effects/Chance Based Tears:
 Spider Bite ✅
 The Common Cold ✅
 Mom's Contacts ✅
-Tough Love 
+Tough Love ✅
 Mom's Eyeshadow ✅
 Iron Bar ✅
 Ball of Tar ✅
 Dark Matter ✅
-Holy Light!
+Holy Light! ✅
 Serpent's Kiss ✅
-God's Flesh
+God's Flesh ✅
 Fruit Cake
-Apple!
-Eye of Greed?
-Glaucoma
-Parasitoid
-Euthanasia
-Little Horn
+Apple! ✅
+Eye of Greed ✅
+Glaucoma ✅
+Parasitoid ✅
+Euthanasia ✅
+Little Horn ✅
 Playdough Cookie
 Uranus ✅
 Lodestone ✅
 Rotten Tomato ✅
-Knockout Drops
+Knockout Drops ✅
 
 Pinky Eye ✅
-Black Tooth
-Nose Goblin
-Jawbreaker
+Black Tooth ✅
+Nose Goblin ✅
+Jawbreaker ✅
 Chewed Pen ✅
-Teardrop Charm
-Brain Worm
-Torn Card?
+Teardrop Charm ✅
+Torn Card ✅
 
-- Multishot - Shoots tears when jumping/spindashing?:
+- Multishot - Shoots tears when jumping/spindashing:
 The Inner Eye
 Mom's Eye
 Loki's Horns
 Mutant Spider
+Monstro's Lung
 20/20
 Lead Pencil
 Eye Sore
@@ -110,5 +111,5 @@ Cricket's Body ✅
 Compound Fracture ✅
 Haemolacria ✅
 
--10
-32/104
+-11
+63/104
